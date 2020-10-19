@@ -1,23 +1,15 @@
 //CB>-------------------------------------------------------------------
 //
-//   File, Component, Release:
-//                  IdaTdfAccess.cc 1.1
 //
 //   File:      IdaTdfAccess.cc
-//   Revision:  1.1
+//   Revision:  1.2
 //   Date:      18-NOV-2010 14:20:52
 //
 //   DESCRIPTION:
 //
 //
-//
 //<CE-------------------------------------------------------------------
-
-
-
-
-static const char * SCCS_Id_TdfAccess_cc = "@(#) IdaTdfAccess.cc 1.1";
-
+static const char * SCCS_Id_TdfAccess_cc = "@(#) IdaTdfAccess.cc 1.2";
 
 
 #include <IdaDecls.h>
@@ -1549,7 +1541,7 @@ Void TdfAccess::handleRequest(Message& message)
 	else
 	{
 		// Wenn dieser Fall ein tritt, liegt ein Fehler vor
-		idaTrackExcept(("Unknown request type: %s",&requestType));
+		idaTrackExcept(("Unknown request type: %s", requestType.cString()));
 		refuseRequest(requestContainer, "formatError", "unknown request type (see XML root element)");
 		return;
 	}
@@ -2767,19 +2759,18 @@ ReturnStatus TdfAccess::sendBigString(RefId			serverOid,	// OID des Servers
 //
 Void TdfAccess::dataToHexString(String byteSequence, String& result)
 {
-#ifdef CLASSLIB_03_00
 	TRACE_FUNCTION("TdfAccess::dataToHexString(...)");
-#endif
+	UInt length = byteSequence.len();
 
-	char buf[265];
-
-	for (int h = 0; h < byteSequence.len(); h ++)
+	// DE_MR_6075, cp, 2010-10-19
+	char* buf = new char [(2*length)+1];
+	for (int h = 0; h < length; h ++)
 	{
 		sprintf(buf + (h << 1), "%02X", (unsigned int) (unsigned char) byteSequence[h]);
 	}
-	buf[2 * byteSequence.len()] = '\0';
-
+	buf[(2*length)] = '\0';
 	result = String(buf);
+	delete [] buf;
 }
 
 
@@ -3972,7 +3963,7 @@ Void TdfAccess::processSendQueue()
 		#endif
 
 		idaTrackData(("search/modifyRequest() failed:  error.getErrorCode() = %d", error.getErrorCode() ));
-		idaTrackData(("search/modifyRequest() failed:  error.getErrorSource() = %s", error.getErrorCode() ));
+		idaTrackData(("search/modifyRequest() failed:  error.getErrorSource() = %s", error.getErrorSource() ));
 		idaTrackData(("search/modifyRequest() failed:  error.getErrorText() = %s", error.getErrorText() ));
 
 		
