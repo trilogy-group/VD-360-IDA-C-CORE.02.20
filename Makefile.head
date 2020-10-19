@@ -7,22 +7,6 @@
 
 .SUFFIXES: .cc .o .a .h
 
-############### CLASSLIB Version is an environment variable #######################
-ifeq ($(strip $(CLVER)),)
-# dummy label for writing message
-#
-default::
-	@echo "environment variable CLVER undefined"
-endif
-
-################ OSAAPI Version is an environment variable #######################
-ifeq ($(strip $(OSAAPIVER)),)
-# dummy label for writing message
-#
-default::
-	@echo "environment variable OSAAPIVER undefined"
-endif
-
 #
 ################ determine platform  #######################
 #
@@ -153,31 +137,26 @@ TEMPLATEPATH:=$(TEMPLATEBASEPATH)
 # include pathes to imported stuff
 #
 
-
 ifeq ($(UNAME), AIX)
-  STLPATH:=/pool/ospace/stl.02.00.07
   STLLIBPATH:=$(STLPATH)/lib
   STLINCLUDES:=-I$(STLPATH) -I$(STLPATH)/include -I$(STLPATH)/ospace/stl
 else
 ifeq ($(UNAME), HP-UX)
-  STLPATH:=/pool/stl/PCPSTL.01.01.12
   STLLIBPATH:=
   STLINCLUDES:=-I$(STLPATH)/include
 else
 ifeq ($(UNAME), SuSE-Linux)
-  STLPATH:=/pool/stl/stl.01.02
   STLLIBPATH:=
   STLINCLUDES:=-I$(STLPATH)/include
 else
 ifeq ($(UNAME), Windows)
-  STLPATH:=$(POOL)/stl/PCPSTL.01.01.12
   STLLIBPATH:=/LIBPATH:"$(STLPATH)/lib"
   STLINCLUDES:= /I"$(STLPATH)/include"
   REGEXPPATH:=$(POOL)/regexp/ZM_REGEXP.03.00.03
   REGEXPINCLUDES:=/I"$(REGEXPPATH)/include"
 else
 default::
-	@echo "unknown operating system on setting STLPATH"
+	@echo "unknown operating system $(UNAME) on setting STLPATH"
 endif
 endif
 endif
@@ -256,11 +235,8 @@ ifdef PROFILING
 endif
 
 
-CLHOME=$(POOL)/classlib/classlib.$(CLVER)
 ifeq ($(UNAME),Windows)
-   OSAAPIHOME=$(POOL)/osaapi/OSA_API.$(OSAAPIVER)/classlib.$(CLVER)/msvc6.0
-else
-   OSAAPIHOME=$(POOL)/osaapi/OSA_API.$(OSAAPIVER)/classlib.$(CLVER)
+   OSAAPIHOME=$(OSAAPIHOME)/msvc6.0
 endif
 
 # if CLHOME contains pool (substring matches as well), no multiplatform structure will be assumed,

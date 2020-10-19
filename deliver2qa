@@ -1,0 +1,576 @@
+#! /bin/ksh
+#
+# Description: builds a runtime-level from a source-level
+#
+#
+
+
+
+    
+getotherpath ()
+{
+    #
+    # select ida root by path
+    #
+    typeset tmp
+    print ">>>>>: Path to the toplevel directory of the ida to be delivered"
+    print -n ">>>>>: "
+    read tmp
+    idaroot=${tmp%${platformpath}}
+
+    defaultsourcehost=`uname -n`
+
+    print -n ">>>>>: Source host (default=${defaultsourcehost}): "
+    read sourcehost
+    if [ -z "$sourcehost" ]
+    then
+		  sourcehost=$defaultsourcehost
+		  print "INFO : Host is $sourcehost"
+    fi
+	 defaultuser=`whoami`
+    print -n ">>>>>: User (default=$defaultuser): "
+    read sourceuser
+
+    if  [ -z "$sourceuser" ]
+    then
+		  sourceuser=`whoami`
+		  print "INFO : User is $sourceuser"
+    fi
+
+}
+
+
+
+selectsourcedirectory ()
+{
+    typeset answer
+
+    #
+    # select operating system and sourcelevel
+    #
+    
+    print -n ">>>>>: Operating system :\n"
+    export PS3=">>>>>:"
+    select answer in 'aix4.3.3' 'aix5.2' 'hpux10.20' 'hpux11.11' 'hpux11.0' 'linux9.1' 'linux10.2' 'SLES10'
+    do
+	case $answer in
+		  1|aix4.3.3)
+		platformpath=/AIX43
+		osname="AIX 4.3.3"
+		operatingsystem="aix4.3.3"
+      shlibext=".a"
+      shlinklibext="25$shlibext"
+		break
+		;;
+	    2|aix5.2)
+		platformpath=/AIX52
+		osname="AIX 5.2"
+		operatingsystem="aix5.2"
+      shlibext=".a"
+      shlinklibext="25$shlibext"
+		break
+		;;
+	    3|hpux10.20)
+		platformpath=/HP-UX10
+		osname="HP-UX 10.20"
+		operatingsystem="hpux10.20"
+      shlibext=".sl"
+      shlinklibext="$shlibext.25"
+		break
+		;;
+	    4|hpux11.11)
+		platformpath=/HP-UX11
+		osname="HP-UX 11.11"
+		operatingsystem="hpux11.11"
+      shlibext=".sl"
+      shlinklibext="$shlibext.25"
+		break
+		;;
+	    5|hpux11.0)
+		platformpath=/HP-UX11
+		osname="HP-UX 11.0"
+		operatingsystem="hpux11.0"
+      shlibext=".sl"
+      shlinklibext="$shlibext.25"
+		break
+		;;
+	    6|linux9.1)
+		platformpath=/SuSE-Linux91
+		osname="Linux 9.1"
+		operatingsystem="linux9.1"
+      linux="true"
+      shlibext=".so"
+      shlinklibext="$shlibext.25"
+      xercesroot="/pool/xerces/xerces.02.05.00"
+		break
+		;;
+	    7|linux10.2)
+		platformpath=/SuSE-Linux102
+		osname="Linux 10.2"
+		operatingsystem="linux10.2"
+      linux="true"
+      shlibext=".so"
+      shlinklibext="$shlibext.27"
+      xercesroot="/pool/xerces/xerces.02.07.00"
+		break
+		;;
+	    8|SLES10)
+		platformpath=/SuSE-Linux10
+		osname="SLES 10"
+		operatingsystem="linux10"
+      linux="true"
+      shlibext=".so"
+      shlinklibext="$shlibext.27"
+      xercesroot="/pool/xerces/xerces.02.07.00"
+		break
+		;;
+	esac
+    done
+    unset PS3
+    
+
+}
+
+
+getreferencepath ()
+{
+    #
+    # selection of the runtimelevel should work automatically
+    # (determine last used levelnumber + 1 ) 
+    #
+    print ">>>>>: Path on machine wssrv to the delivered versions for this release"
+    print -n ">>>>>: "
+    read referencebasepath
+}
+
+
+getprojectnameandreferencepath ()
+{
+		referencebasepath="/qadelivery/irfa/ida/02.20"
+		releasenameforqa="02.20"
+      dimensionsProject=IDA-C-CORE.02.20; # 
+}
+
+
+getruntimelevel ()
+{
+    #
+    # selection of the runtimelevel should work automatically
+    # (determine last used levelnumber + 1 ) 
+    #
+    print -n ">>>>>: Number of the Runtime-Level to be created: "
+    read runtimelevel
+}
+
+
+
+getdeliverybasepath ()
+{
+    #
+    # choose the location where the files to be delivered are collected
+    #
+    print ">>>>>: Path to the delivery directory where the files to be delivered are collected\n   default is $HOME/delivery\n   note: the contents of the subdirectory $operatingsystem will be deleted!"
+    print -n ">>>>>: "
+    read deliverybasepath
+
+    if [ -z "$deliverybasepath" ]
+    then
+		  deliverybasepath=$HOME/delivery
+		  print "INFO : Using $deliverybasepath"
+    fi
+    #
+    # create directory for the runtime-release
+    #
+    if [ ! -d $deliverybasepath ]
+    then
+		  mkdir $deliverybasepath
+	if [ $? -ne 0 ]
+	then
+	    print "ERROR: Directory $deliverybasepath could not be created"
+	    exit 1
+	else
+	    print "INFO : New directory $deliverybasepath created"
+	fi
+    fi
+}
+
+setglobalvariables ()
+{
+    typeset utilpath
+
+    #
+    # global settings
+    #
+    projectname="/__notinitialized"
+    releasenameforqa="/__notinitialized"
+    dimensionsProject="/__notinitialized"
+    deliveryrelease="/__notinitialized"
+    referencebasepath="/__notinitialized"
+    referencepath="/__notinitialized"
+    platformpath="/__notinitialized"
+    sourcelevel="/__notinitialized"
+    sourceuser="/__notinitialized"
+    sourcehost="/__notinitialized"
+    idaroot="/__notinitialized"
+    runtimelevel="/__notinitialized"
+    deliverypath="/__notinitialized"       # path where delivery files are collected
+    deliverybasepath="/__notinitialized"   # path (without os) where delivery files are collected
+    operatingsystem="/__notinitialized"
+    deliverytmpdir="/__notinitialized"
+    osname="/__notinitialized"
+
+    #
+    # check path for utilities
+    #
+    utilpath="/usr/local/bin"
+    if [ -z "$(print $PATH | grep "$utilpath")" ]
+    then
+		  export PATH=$utilpath:$PATH
+    fi
+
+    #
+    # DISPLAY needed later by the called editor
+    #
+    #if [ -z "$DISPLAY" ]
+    #then 
+	#	  print "ERROR: DISPLAY variable not set"
+   # fi
+}
+
+preparesourcedirectory ()
+{
+    # prepare the temporary delivery directory, if directory does not exist create it and build
+    # from dimensions
+
+    currentMachine=`uname -n`
+
+    if [[ ! -d $idaroot ]]
+    then
+        if [[  "${compilermachine}" != "${currentMachine}" ]]
+        then
+				print "ERROR:  Directory $idaroot does not exist"
+            print "INFO:   compile is only possible on machine you want to build the delivery for"
+            exit 1
+        fi
+        print "INFO: Directory $idaroot does not exist. Will get files from dimensions and build"
+		  export SOURCERELEASEDIR=$idaroot
+        print -n ">>>>>: Number of the baseline to be extracted: "
+        read baselineNumber
+        print "extracting baseline $dimensionsProject.$baselineNumber from dimensions to $deliverypath"
+        dmcli  -param /scriptpool/dimensions/conn_dmquery.txt -cmd 'download /baseline="DE:$dimensionsProject.$baselineNumber" /noexpand /user_directory="$idaroot" /NOMETADATA /overwrite'
+
+        cd $idaroot
+
+        cd $deliverypath
+    fi
+}
+
+checksourcedirectory ()
+{
+
+    typeset tmp
+
+    preparesourcedirectory
+	 #
+    # check existence of the specified ida source
+    #
+    
+    # The big difference for Linux is, that an ssh connection must be established!
+    if [[ "${linux}" = "true" ]]
+	 then
+		  tmp=`ssh $sourcehost -l $sourceuser "/bin/ls -al $idaroot 2>/dev/null"`
+	 else
+		  tmp=`remsh $sourcehost -l $sourceuser -e "ksh -c '/bin/ls -al $idaroot 2>/dev/null'"`
+    fi
+
+
+    if [ -z "$tmp" ]
+    then 
+		  print "ERROR:  Directory $idaroot does not exist"
+		  print "INFO :  Or it is not accessible for user: $sourceuser at host $sourcehost"
+		  exit 1
+    fi
+	 
+	 if [[ "${linux}" = "true" ]]
+	 then 
+		  tmp=`ssh $sourcehost -l $sourceuser "/bin/ls -al $idaroot${platformpath} 2>/dev/null"`
+	 else
+		  tmp=`remsh $sourcehost -l $sourceuser -e "ksh -c '/bin/ls -al $idaroot${platformpath} 2>/dev/null'"`
+    fi
+
+    if [ -z "$tmp" ]
+    then 
+		  print "ERROR:  Directory $idaroot${platformpath} does not exist"
+		  print "INFO :  Or it is not accessible for user: $sourceuser at host $sourcehost"
+		  exit 1
+    fi	 
+}
+
+checktargetdirectory ()
+{
+    typeset tmp 
+    
+    # check if there is an appropriate target directory in the /reference tree
+    #
+    tmp=`/bin/ls $referencebasepath 2> /dev/null | fgrep -cx $runtimelevel`
+    if [ $tmp -lt 1 ]
+    then
+		  mkdir $referencebasepath/$runtimelevel
+		  if [ $? -ne 0 ]
+		  then
+				print "ERROR: Directory $referencebasepath/$runtimelevel could not be created"
+				exit 1
+		  else
+				print "INFO : New directory $referencebasepath/$runtimelevel created"
+		  fi
+    fi
+    referencepath=$referencebasepath/$runtimelevel
+
+    #
+    # check if the target directory in the /reference tree is empty
+    #
+    tmp=`/bin/ls $referencepath 2> /dev/null| wc -c`
+    
+    if [ "$tmp" -gt 0 ]
+    then
+		  print "ERROR: directory $referencepath  is not empty"
+		  print "INFO : runtime level $runtimelevel probably already delivered"
+		  exit 1
+    fi
+}
+
+preparedeliverydirectory ()
+{
+    typeset tmpdir newdirs
+    
+    #
+    # free subdirectory for a certain delivery
+    #
+    deliverypath=$deliverybasepath/$operatingsystem
+    if [ -d $deliverypath ]
+    then
+		  print "INFO : directory $deliverypath will be removed now"
+		  /bin/rm -rf $deliverypath
+    fi
+
+    print "INFO : create directory $deliverypath"
+    mkdir $deliverypath
+    
+    #
+    # temporary directory used for this delivery session
+    #
+    deliverytmpdir=${deliverybasepath}/tmpdir.$$
+    mkdir $deliverytmpdir
+
+    #
+    # construct missing directories
+    #
+    newdirs="custom config"
+    for i in $newdirs
+    do
+	print "INFO : mkdir  $deliverypath/$i"
+	mkdir $deliverypath/$i
+    done
+}
+
+
+downloadfiles ()
+{
+    typeset loaddirs loadfiles d f answer idaplatformpath
+    #
+    # download of the directories from $idaroot needed for runtime-release
+    #
+
+	loaddirs="bin modules templates"
+	for d in $loaddirs
+	do
+		case ${d} in 
+			 modules)
+				  print "INFO : cp -r $idaroot${platformpath}/$d $deliverypath"
+				  cp -r $idaroot${platformpath}/$d $deliverypath
+				  ;;
+			 *)
+				  print "INFO : cp -r $idaroot/$d $deliverypath"
+				  cp -r $idaroot/$d $deliverypath
+				  ;;
+		esac
+	done
+
+   mkdir $deliverypath/dat
+   cp    $idaroot/dat/ida.rtd $deliverypath/dat
+   cp    $idaroot/BuildInfo.xml $deliverypath/BuildInfo.xml
+
+}    
+
+
+function checkExistenceAndSize
+{
+    typeset -r file=$1
+    
+	 if [ ! -a $file ] 
+    then
+		 print "$file does not exist"
+       let err=err+1
+       return 1
+    fi
+
+    if [ ! -s $file ] 
+    then
+	    print "$file is empty"
+	    let err=err+1
+       return 1
+    fi  
+
+    return 0
+}
+
+
+checksourcecontent ()
+{
+
+	 let err=0
+
+    #
+    # check existence and size of all binaries in the bin or modules folder
+    #
+       
+	 for i in IdaWebProcess IdaTdfProcess
+	 do 
+	    checkExistenceAndSize $deliverypath/modules/${i}
+	 done
+	
+    if [ err -eq 0 ]
+	 then
+	    #print "***** All processes in ./modules exist."
+	    print "***** All processes in ./modules exist."
+    else
+       print "***** Since some files are missing the script is stopped now!!!"
+		 rmdir $referencebasepath/$runtimelevel
+		 exit 1
+    fi 
+}
+
+
+checkxbit ()
+{
+    typeset dir f files
+
+    dir=$1
+    files="`/bin/ls $dir`"
+    
+    for f in $files
+    do
+	if [ ! -x $dir/$f ]
+        then 
+	    ls -aCF $f
+	    print "WARNING: $dir/$f had no execution permission before"
+	fi
+    done
+}
+
+adjustaccessrights ()
+{
+   typeset d dirs files
+   dirs=""`/bin/ls $deliverypath`""
+
+   print "INFO : adjust permission bits"
+
+   for d in $dirs
+   do 
+     print chmod 755 $deliverypath/$d
+     chmod 755 $deliverypath/$d
+   done
+
+   checkxbit $deliverypath/bin
+   chmod 555 $deliverypath/bin/*
+   checkxbit $deliverypath/modules
+   chmod 555 $deliverypath/modules/*
+   chmod 444 $deliverypath/dat/*
+   chmod 444 $deliverypath/templates/*
+
+}
+
+
+cleanup ()
+{
+    if [ -d $deliverytmpdir ]
+    then
+       /bin/rm -rf $deliverytmpdir
+    fi
+}
+
+copytoreference ()
+{
+    typeset answer
+
+    #
+    # copy ida delivery directory tree to the reference machine
+    #
+
+    # force to enter the loop
+    answer="y"
+    while [ "$answer" = "y" ]
+    do	
+	    print  -n ">>>>>: everything fine (y/n) ? "
+	    read answer
+	    case $answer in
+	      y)  break ;;
+	      n)  print
+		       print "*****: runtime-level delivery discarded"
+	          print
+	          cleanup
+		       exit 1 ;;
+	      *)  print "ERROR: please type y or n"
+		       # loop should not be left
+		       answer="y" ;;
+       esac
+    done
+
+    print "copying $deliverypath/* to $referencepath\n"
+    cp -r $deliverypath/* $referencepath
+
+}
+
+makereleaseinfo ()
+{
+    cd $deliverypath
+    (pwd)
+    echo "generating releaseInfo"
+    /scriptpool/buildinfo/genreleaseinfo
+}
+
+
+#
+# begin of main script
+#
+
+trap "print 'Interrupted - Cleaning up'; cleanup; exit 1" 1 2 15
+trap "cleanup" 0
+print
+print "***** runtime level delivery"
+print
+
+
+setglobalvariables
+getprojectnameandreferencepath
+selectsourcedirectory    # get operating system 
+getotherpath             # get toplevel directory of the ida to be delivered
+getruntimelevel          # ask for the number of the rtl to be delivered
+checktargetdirectory     # check if targetdirectory (in qadelivery) is empty 
+
+getdeliverybasepath      # get the temporary directory where the delivery files are to be collected
+preparedeliverydirectory # prepare the dir where the delivery files are collected
+
+checksourcedirectory     # check if the entered directory is ok (i.e. exists etc., else create it!)
+downloadfiles            # copy files to temporary delivery directory
+adjustaccessrights       #yes in the temporary delivery directory
+checksourcecontent       # check if the files exist and are ok ...
+makereleaseinfo
+
+copytoreference          # i.e. to /qadelivery/...
+
+cleanup
+
+print
+print "***** runtime level delivery finished"
+print

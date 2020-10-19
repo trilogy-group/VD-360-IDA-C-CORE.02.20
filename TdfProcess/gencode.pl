@@ -30,7 +30,7 @@ $CCFileName = $FILE_BASENAME . ".cc";
 #  OSA Path: The full path of all OSA include files without trailing slash
 #            This may vary depending on the machine (HPUX / AIX) you are working with
 # OSAAPIHOME=/pool/osaapi/OSA_API.$(OSAAPIVER)/classlib.$(CLVER)
-$OSA_PATH = "/pool/osaapi/OSA_API." . $ENV{"OSAAPIVER"} . "/classlib." . $ENV{CLVER} . "/include";
+$OSA_PATH = $ENV{"OSAAPIHOME"} . "/include";
 print "using OSA API: $OSA_PATH\n";
 
 #  relative include path without trailing slash
@@ -206,7 +206,7 @@ sub convEnum
    }
    else
    {
-      print "could not open file !\n";
+      print "\ncould not open file $OSA_PATH / $filename \n"; 
    }
 
    print "ok.\n";
@@ -269,9 +269,9 @@ print H_FILE <<EOT
 //CB>---------------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS
+//                  TdfProcess\gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS
 //
-//   File:      TdfProcess/gencode.pl
+//   File:      TdfProcess\gencode.pl
 //   Revision:      1.0
 //   Date:          12-APR-2008 18:52:13
 //
@@ -283,7 +283,7 @@ print H_FILE <<EOT
 //
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaStringToEnum_h = "@(#) TdfProcess/gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS";
+static const char * SCCS_Id_IdaStringToEnum_h = "@(#) TdfProcess\gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS";
 
 
 // You can not instanciate this class
@@ -379,9 +379,9 @@ print CC_FILE <<EOT
 //CB>---------------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS
+//                  TdfProcess\gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS
 //
-//   File:      TdfProcess/gencode.pl
+//   File:      TdfProcess\gencode.pl
 //   Revision:      1.0
 //   Date:          12-APR-2008 18:52:13
 //
@@ -392,7 +392,7 @@ print CC_FILE <<EOT
 //
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaStringToEnum_cc = "@(#) TdfProcess/gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS";
+static const char * SCCS_Id_IdaStringToEnum_cc = "@(#) TdfProcess\gencode.pl 1.0 12-APR-2008 18:52:13 DMSYS";
 
 
 #include <string.h>
