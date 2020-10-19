@@ -1,0 +1,450 @@
+#!/bin/ksh
+
+UNITS="Base WebProcess TdfProcess"
+LIBS="idabase idatdf idaweb"
+MODULES="IdaWebProcess IdaTdfProcess"
+
+
+function setlogfilename
+{
+    ################ determine platform  #######################
+    #
+    UNAME=$(uname) 
+
+    #
+    ################ determine machine name #######################
+    #
+    if [[ $UNAME = "AIX" ]]
+    then
+	HOSTNAME=$(/bin/hostname)
+        OSVERSION=$(uname -v)
+	OSRELEASE=$(uname -r)
+        else
+	if [[ $UNAME = "HP-UX" ]]
+	then
+	    HOSTNAME=$(/bin/hostname)
+	    OSVERSION=$(uname -r|cut -d'.' -f2)
+	    OSRELEASE=
+	else
+	    if [[ $UNAME = "Linux" ]]
+	    then
+                   UNAME="SuSE-Linux"
+		   HOSTNAME=$(/bin/hostname)
+
+                   EDITION=$(grep i586 /etc/SuSE-release|cut -d ' ' -f3 )
+                   OSVERSION=$(grep VERSION /etc/SuSE-release|cut -d '=' -f2|cut -d ' ' -f2|cut -d '.' -f1 )
+                   if [[ $EDITION = "Enterprise" ]]
+	           then
+                        OSRELEASE=
+                   else
+                        OSRELEASE=$(grep VERSION /etc/SuSE-release|cut -d '=' -f2|cut -d ' ' -f2|cut -d '.' -f2 )
+                   fi
+	    else
+		   HOSTNAME=$(/usr/ucb/hostname)
+		   OSVERSION="undefined"
+		   OSRELEASE=
+	    fi
+	fi
+    fi
+
+    ################ set logfilename and platformdir #######################
+    #
+    logfile=logfile.make.$HOSTNAME
+    PLATFORMDIR=${UNAME}${OSVERSION}${OSRELEASE}
+}
+
+function showhelp 
+{
+    print "syntax: build [help] | [[clean|debug] ]*"
+    print ""
+    print "help:          this message"
+    print "clean:         clean all compiled stuff"
+    print "               and abort compilation"
+    print "optimize:      compile all units with optimizer"
+    print "debug:         compile all units with debug information"
+    print "all:           is optimize debug"
+}
+
+function getarguments
+{
+    clean=no
+    debug=no
+	 optimize=no
+
+    if [ -z "$1" ]
+    then
+       print "No arguments given - default is compile optimize"
+       print "build help gives a list of all arguments"
+       print 
+       debug=no
+		 optimize=yes
+       return
+    fi
+
+    while [ -n "$1" ]
+    do
+		  case $1 in
+		  help)      showhelp 
+		       exit 0 ;;
+		  clean)     clean=yes ;;
+		  debug)     debug=yes ;;
+		  optimize)  optimize=yes ;;
+		  all)       optimize=yes
+		            debug=yes;;
+	    *)         print $1: unknown argument
+		       exit 1;;
+		  esac
+        shift
+    done
+
+	 
+    if [ "$optimize" = no -a "$debug" = no   ]
+    then
+       print "using optimize as default argument"
+       optimize=yes
+    fi
+}
+
+function preparelogfile
+{
+	rm -f $logfile 
+	touch $logfile
+}
+
+function checklogfile 
+{
+    if [ ! -f $logfile ]
+    then
+	print "$logfile not found in `pwd`"
+	return 1
+    fi
+
+    case $UNAME in
+    AIX)      case $OSVERSION in
+	      4) pattern='\(S\)' ;;
+	      5) pattern='\(S\)' ;;
+         *) print "Not supported osversion $OSVERSION"
+                 return 1 ;;
+	      esac ;;
+    HP-UX)   
+	      case $OSVERSION in
+	      10) pattern='Error [0-9]+:' ;;
+	      11) pattern='Error [0-9]+:' ;;
+	      *) print "Not supported osversion $OSVERSION" 
+		 return 1;;
+	      esac ;;
+    SuSE-Linux)
+	      pattern=':[0-9]+:'
+	      ;;
+    *)   print "Not supported operating system $UNAME"
+         return 1 ;;
+    esac
+
+    egrep -e "$pattern" $logfile
+    if [ $? -eq 0 ]
+    then
+	return 1
+    else
+	return 0
+    fi
+}
+
+
+function createstructure
+{
+    typeset -r SUPPORTED_PLATFORMS="AIX43 AIX52 HP-UX11 SuSE-Linux9 SuSE-Linux91 SuSE-Linux93 SuSE-Linux102 SuSE-Linux10"
+    for i in $SUPPORTED_PLATFORMS
+    do
+		  mkdir $i 2>/dev/null
+		  \cd $i > /dev/null
+		  mkdir install 2>/dev/null 
+		  mkdir modules 2>/dev/null 
+		  mkdir lib 2>/dev/null
+		  mkdir util 2>/dev/null
+		  mkdir modulesdeb 2>/dev/null 
+		  mkdir libdeb 2>/dev/null
+		  mkdir utildeb 2>/dev/null
+		  cd - > /dev/null
+        mkdir Base/$i
+        mkdir TdfProcess/$i
+        mkdir WebProcess/$i
+	done
+}
+
+function doexecuteall
+{
+    # make IdaStringToEnum.h / .cc from OSA API
+    print "generate code for TdfProcess/IdaStringToEnum.h / .cc\n"
+    cd TdfProcess
+    chmod u+w IdaStringToEnum.*
+    perl gencode.pl
+    cd ..
+
+	 if [[ $UNAME = "SuSE-Linux" ]]
+    then
+		  export MAKE=make
+    else
+		  export MAKE=gmake
+    fi
+
+	 if [[ "$clean" = "yes" ]]
+	 then
+		  argument="clean"
+    else
+        echo "clean before building to make sure all objects have been built on this platform :-)"
+		  for i in $UNITS
+		  do
+				cd $i/${PLATFORMDIR}
+				echo "removing objects for $i"
+echo $(pwd)
+			   rm -rf *.o >> ../../$logfile 2>> ../../$logfile
+				cd ../..
+		  done
+	 fi
+
+	 if [[ "$debug" = "yes" ]]
+	 then
+		  for i in $UNITS
+		  do
+				cd $i
+				echo "$MAKE $i $argument debug"
+				$MAKE -k $argument DEBUG=1 >> ../$logfile 2>> ../$logfile
+				cd ..
+		  done
+	 fi
+
+	 if [[ "$optimize" = "yes" ]]
+	 then
+		  for i in $UNITS
+		  do
+				cd $i
+				echo "$MAKE $i $argument optimize"
+				$MAKE -k $argument OPTIMIZE=1 >> ../$logfile 2>> ../$logfile
+				cd ..
+		  done
+	 fi
+
+	 echo "all units done"
+}
+
+function checkall
+{
+    checklogfile
+    if [ $? -ne 0 ]
+    then
+        print "***** Compilation does not seem to be successful"
+    else
+        print "***** Compilation seems to be ok"
+    fi
+
+    if [ "$debug" = "yes" ]
+	 then
+		  checkLibs debug
+		  checkModules debug
+	 fi
+
+    if [ "$optimize" = "yes" ]
+	 then
+		  checkLibs 
+		  checkModules 
+	 fi
+}
+
+function checklogfile 
+{
+    if [ ! -f $logfile ]
+    then
+	print "$logfile not found in `pwd`"
+	return 1
+    fi
+
+    case $UNAME in
+    AIX)      case $OSVERSION in
+	      4) pattern='\(S\)' ;;
+	      5) pattern='\(S\)' ;;
+         *) print "Not supported osversion $OSVERSION"
+                 return 1 ;;
+	      esac ;;
+    HP-UX)   
+	      case $OSVERSION in
+	      10) pattern='Error [0-9]+:' ;;
+	      11) pattern='Error [0-9]+:' ;;
+	      *) print "Not supported osversion $OSVERSION" 
+		 return 1;;
+	      esac ;;
+    SuSE-Linux)
+	      pattern=':[0-9]+:'
+	      ;;
+    *)   print "Not supported operating system $UNAME"
+         return 1 ;;
+    esac
+
+    egrep -e "$pattern" $logfile
+    if [ $? -eq 0 ]
+    then
+	return 1
+    else
+	return 0
+    fi
+}
+
+function checkLibs
+{
+   if [[ "$1" = "debug" ]]
+	 then
+		  DEBUGSUFFIX=deb
+    else 
+        DEBUGSUFFIX=""
+	 fi
+
+	print "\nchecking libraries in ${PLATFORMDIR}/lib${DEBUGSUFFIX}/\n"
+	rm -f $tmplist
+	for i in $LIBS
+	do 
+		checkExistenceAndSize ${PLATFORMDIR}/lib${DEBUGSUFFIX}/lib$i.a
+		print $i >> $tmplist
+	done
+
+	rm -f $tmplist
+
+    if [ err -eq 0 ]
+    then
+		  print "***** All libraries exist and have a size greater than 0"
+    fi
+}
+
+function checkModules
+{
+    #
+    # check existence and size of all libraries
+    #
+   if [[ "$1" = "debug" ]]
+	 then
+		  DEBUGSUFFIX=deb
+    else 
+        DEBUGSUFFIX=""
+	 fi
+    
+   print "\nchecking modules in ${PLATFORMDIR}/modules${DEBUGSUFFIX}/\n"
+	rm -f $tmplist
+	for i in $MODULES
+	do 
+	    checkExistenceAndXBitAndSize ${PLATFORMDIR}/modules${DEBUGSUFFIX}/$i
+	    print $i >> $tmplist
+	done
+
+	rm -f $tmplist
+
+    if [ err -eq 0 ]
+    then
+		  print "***** All modules exist and have a size greater than 0"
+        ln -fs ${PLATFORMDIR}/modules${DEBUGSUFFIX} modules
+    fi
+
+
+}
+
+function checkExistence 
+{
+    typeset -r file=$1
+
+    if [ ! -a $file ] 
+    then
+	print "$file does not exist"
+	let err=${err}+1
+        return 1
+    fi
+    return 0
+}
+
+function checkExistenceAndSize
+{
+    typeset -r file=$1
+
+    checkExistence $file
+    if [ $? -ne 0  ] 
+    then
+	return 1
+    fi
+
+    if [ ! -s $file ] 
+    then
+	print "$file is empty"
+	let err=err+1
+    fi  
+}
+
+function checkExistenceAndXBitAndSize
+{
+    typeset -r file=$1
+
+    checkExistence $file
+    if [ $? -ne 0  ] 
+    then
+	return 1
+    fi
+
+    if [ ! -s $file ] 
+    then
+	print "$file is empty"
+	let err=err+1
+    fi  
+
+    if [ ! -x $file ] 
+    then
+        print "$file is not executable"
+        let err=err+1
+    return 1
+    fi
+}
+
+############################ main part #################
+typeset cmvcVersionsFile
+ 
+if [[ -z "${RIDA}" && ! -f "../rIDA.02.20/cmvcComponentVersions.env" && ! -f ./cmvcComponentVersions.env ]]
+then
+    print "$(pwd)"
+    print "________________________________________________"
+    print "need cmvcComponentVersions.env to build ida"
+    print "either set environment variable RIDA to directory"
+    print "where cmvcComponentVersions.env is located"
+    print "or copy cmvcComponentVersions.env to $(pwd)"
+    print "________________________________________________"
+    exit
+fi
+
+if [[ ! -f ./cmvcComponentVersions.env ]]
+then
+  if [[ -z "${RIDA}" ]]
+  then
+    if [[ -f "../rIDA.02.20/cmvcComponentVersions.env" ]]
+    then
+        cmvcVersionsFile=../rIDA.02.20/cmvcComponentVersions.env
+    fi
+  else
+       cmvcVersionsFile=${RIDA}/cmvcComponentVersions.env
+  fi
+else
+   cmvcVersionsFile=./cmvcComponentVersions.env
+fi
+
+
+print "reading ${cmvcVersionsFile}"
+. ${cmvcVersionsFile}
+
+
+let err=0
+tmplist=~/tmp/list.$$
+
+getarguments $*
+setlogfilename
+preparelogfile
+createstructure
+
+doexecuteall
+if [ "$clean" = "no" ]
+then
+	checkall
+fi 
+
+

@@ -1,0 +1,653 @@
+#  %w%
+
+#
+# list all labels which do not correspond to an existing file
+#
+.PHONY: default error
+
+.SUFFIXES: .cc .o .a .h
+
+############### CLASSLIB Version is an environment variable #######################
+ifeq ($(strip $(CLVER)),)
+# dummy label for writing message
+#
+default::
+	@echo "environment variable CLVER undefined"
+endif
+
+################ OSAAPI Version is an environment variable #######################
+ifeq ($(strip $(OSAAPIVER)),)
+# dummy label for writing message
+#
+default::
+	@echo "environment variable OSAAPIVER undefined"
+endif
+
+#
+################ determine platform  #######################
+#
+
+ifndef UNAME
+  UNAME:=$(shell uname | sed -e 's/^CYGWIN.*/CYGWIN/')
+endif
+
+USEXML:=usexml
+
+#
+################ determine machine, OS-Release  #######################
+#
+
+ifeq ($(UNAME), AIX)
+
+  HOSTNAME:=$(shell /bin/hostname)
+
+  ifndef OS_VERSION
+    OS_VERSION:=$(shell csh -fc "uname -v")
+  endif
+
+  ifndef OS_RELEASE
+    OS_RELEASE:=$(shell csh -fc "uname -r")
+  endif
+
+else
+
+  ifeq ($(UNAME), HP-UX)
+
+    HOSTNAME:=$(shell /bin/hostname)
+
+    ifndef OS_VERSION
+      OS_VERSION:=$(shell csh -fc "uname -r|cut -d'.' -f2")
+    endif
+
+    ifndef OS_RELEASE
+      OS_RELEASE:=
+    endif
+
+    MODEL:=$(shell csh -fc "uname -m|cut -d'/' -f2|cut -b1")
+
+    ifeq ($(MODEL), 8)
+      MODELFLAG:=-D_HP_800
+    else
+      MODELFLAG:=-D_HP_700
+    endif
+
+  else
+    ifeq ($(UNAME), Linux)
+      HOSTNAME:=$(shell /bin/hostname)
+      UNAME:=SuSE-Linux
+	EDITION:=$(shell grep i586 /etc/SuSE-release|cut -d ' ' -f3 )
+	OS_VERSION=$(shell grep VERSION /etc/SuSE-release|cut -d '=' -f2|cut -d ' ' -f2|cut -d '.' -f1 )
+	ifeq ($(EDITION), Enterprise)
+		OS_RELEASE=
+	else
+		OS_RELEASE=$(shell grep VERSION /etc/SuSE-release|cut -d '=' -f2|cut -d ' ' -f2|cut -d '.' -f2 )
+	endif  
+    else
+      ifeq ($(UNAME),CYGWIN)
+        UNAME=Windows
+        HOSTNAME:=$(shell hostname)
+        ifndef OS_VERSION
+          OS_VERSION:=2000
+        endif     
+        ifndef OS_RELEASE
+          OS_RELEASE:=
+        endif
+      else
+        HOSTNAME:=$(shell /usr/ucb/hostname)
+      endif
+    endif
+  endif
+endif
+
+#
+################ common settings  #######################
+#
+
+ifndef $(POOL)
+  ifeq ($(UNAME), Windows)
+    POOL:=//obelix/winpool/pool
+  else
+    POOL:=/pool
+  endif
+endif
+
+#relativ to whre the makefile is placed
+ifndef RELATIVEROOTDIR
+  RELATIVEROOTDIR=..
+endif
+
+# the sources lies relativ to where the compiler works, MUST end with '/' 
+ifndef RELATIVE_SOURCE_DIR
+  RELATIVE_SOURCE_DIR=../
+endif
+
+ifndef PLATFORMDIR
+  PLATFORMDIR=$(UNAME)$(OS_VERSION)$(OS_RELEASE)
+endif
+
+ifndef BINPATH
+  BINPATH:=$(RELATIVEROOTDIR)/$(PLATFORMDIR)/bin
+endif
+
+ifndef MODULESPATH
+  MODULESPATH:=$(RELATIVEROOTDIR)/$(PLATFORMDIR)/modules
+endif
+
+ifndef UTILPATH
+  UTILPATH:=$(RELATIVEROOTDIR)/$(PLATFORMDIR)/util
+endif
+
+# MAKELIBPATH is adapted to the compile-directory by the -L compile-flags
+ifndef MAKELIBPATH
+  MAKELIBPATH:=$(RELATIVEROOTDIR)/$(PLATFORMDIR)/lib
+endif
+
+TEMPLATEBASEPATH=./tempinc
+TEMPLATEPATH:=$(TEMPLATEBASEPATH)
+
+
+#
+################ imported stuff  #######################
+#
+#
+# include pathes to imported stuff
+#
+
+
+ifeq ($(UNAME), AIX)
+  STLPATH:=/pool/ospace/stl.02.00.07
+  STLLIBPATH:=$(STLPATH)/lib
+  STLINCLUDES:=-I$(STLPATH) -I$(STLPATH)/include -I$(STLPATH)/ospace/stl
+else
+ifeq ($(UNAME), HP-UX)
+  STLPATH:=/pool/stl/PCPSTL.01.01.12
+  STLLIBPATH:=
+  STLINCLUDES:=-I$(STLPATH)/include
+else
+ifeq ($(UNAME), SuSE-Linux)
+  STLPATH:=/pool/stl/stl.01.02
+  STLLIBPATH:=
+  STLINCLUDES:=-I$(STLPATH)/include
+else
+ifeq ($(UNAME), Windows)
+  STLPATH:=$(POOL)/stl/PCPSTL.01.01.12
+  STLLIBPATH:=/LIBPATH:"$(STLPATH)/lib"
+  STLINCLUDES:= /I"$(STLPATH)/include"
+  REGEXPPATH:=$(POOL)/regexp/ZM_REGEXP.03.00.03
+  REGEXPINCLUDES:=/I"$(REGEXPPATH)/include"
+else
+default::
+	@echo "unknown operating system on setting STLPATH"
+endif
+endif
+endif
+endif
+
+
+#
+################ debug specific settings  #######################
+#
+ifndef OPTIMIZE
+  ifndef DEBUG
+    DEBUG:=true
+  endif
+else
+  DEBUG:=
+endif
+
+
+ifdef DEBUG
+  NAMINGPOSTFIX=deb
+  override MAKELIBPATH:=$(MAKELIBPATH)$(NAMINGPOSTFIX)
+  override BINPATH:=$(BINPATH)$(NAMINGPOSTFIX)
+  override MODULESPATH:=$(MODULESPATH)$(NAMINGPOSTFIX)
+  override UTILPATH:=$(UTILPATH)$(NAMINGPOSTFIX)
+  ifeq ($(UNAME), Windows)
+    DEBUGFLAGS:=/ZI /MDd
+    LDDEBUGFLAGS:=/DEBUG
+    STLLIB:=
+    REGEX_LIBPATH:=/LIBPATH:"$(REGEXPPATH)/libdeb"
+  else
+    DEBUGFLAGS:=-g
+  endif
+  override TEMPLATEPATH:=$(TEMPLATEPATH).$(NAMINGPOSTFIX)
+endif
+
+#
+################ optimize specific settings  #######################
+#
+
+ifdef OPTIMIZE
+  ifeq ($(UNAME), Windows)
+    DEBUGFLAGS:=/O2 /D "NDEBUG" /MD
+    LDDEBUGFLAGS:=
+    STLLIB:=
+    REGEX_LIBPATH=/LIBPATH:"$(REGEXPPATH)/lib"
+  else
+    DEBUGFLAGS:=-O
+    LDDEBUGFLAGS:=-g
+  endif
+endif
+
+#
+################ profiling specific settings  #######################
+#
+
+
+ifdef EXCEPTIONS
+  NAMINGPOSTFIX=eh
+  override MAKELIBPATH:=$(MAKELIBPATH)$(NAMINGPOSTFIX)
+  override TEMPLATEPATH:=$(TEMPLATEPATH).$(NAMINGPOSTFIX)
+
+  ifeq ($(UNAME), Windows)
+    EXCEPTIONFLAGS:=/GX
+  else
+    EXCEPTIONFLAGS:=+eh
+  endif
+endif
+
+
+ifdef PROFILING
+  NAMINGPOSTFIX=prof
+  override MAKELIBPATH:=$(MAKELIBPATH)$(NAMINGPOSTFIX)
+  override BINPATH:=$(BINPATH)$(NAMINGPOSTFIX)
+  override MODULESPATH:=$(MODULESPATH)$(NAMINGPOSTFIX)
+  override TEMPLATEPATH:=$(TEMPLATEPATH).$(NAMINGPOSTFIX)
+endif
+
+
+CLHOME=$(POOL)/classlib/classlib.$(CLVER)
+ifeq ($(UNAME),Windows)
+   OSAAPIHOME=$(POOL)/osaapi/OSA_API.$(OSAAPIVER)/classlib.$(CLVER)/msvc6.0
+else
+   OSAAPIHOME=$(POOL)/osaapi/OSA_API.$(OSAAPIVER)/classlib.$(CLVER)
+endif
+
+# if CLHOME contains pool (substring matches as well), no multiplatform structure will be assumed,
+# i.e. the libraries are to be found e.g. in classlib/lib, otherwise in e.g. classlib/AIX41/lib
+
+ifeq (pool, $(findstring pool, $(subst /, ,$(CLHOME))))
+  ZMLLIBPATH:=$(CLHOME)/lib$(NAMINGPOSTFIX)
+else
+  ZMLLIBPATH:=$(CLHOME)/$(PLATFORMDIR)/lib$(NAMINGPOSTFIX)
+endif
+
+OSAAPILIBPATH:=$(OSAAPIHOME)/lib$(NAMINGPOSTFIX)
+
+ifeq ($(UNAME),Windows)
+  ZMLINCLUDES:=/I$(CLHOME)/include
+  DYNGENINCLUDES:=/I$(CLHOME)/dyngen/include
+  OSAAPIINCLUDES:=/I$(OSAAPIHOME)/include /I$(OSAAPIHOME)/tdframe 
+  IDAINCLUDES:=/I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/Base /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/TdfProcess /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/WebProcess 
+else
+  ZMLINCLUDES:=-I$(CLHOME)/include 
+  DYNGENINCLUDES:=-I$(CLHOME)/dyngen/include
+  OSAAPIINCLUDES:=-I$(OSAAPIHOME)/include -I$(OSAAPIHOME)/tdframe
+  IDAINCLUDES:=-I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/Base -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/TdfProcess -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/WebProcess 
+  XMLINCLUDES:=-I$(XERCESHOME)/include/xercesc \
+	            -I$(XERCESHOME)/include
+  XMLLIBPATH:=$(XERCESHOME)/lib
+endif
+
+
+#
+#################  AIX specific settings #######################
+#
+
+ifeq ($(UNAME), AIX)
+
+#
+################# AIX 4 specifics ###########################
+#
+  ifeq ($(OS_VERSION), 4)
+
+    ifeq ($(OS_RELEASE),3)
+
+      STLFLAGS:=        -DOS_ANSI -DOS_AIX_4 -DOS_USE_CLASSLIB_STL_NAMES -DOS_NO_ALLOCATORS
+      NETLIBS:=         -lbsd
+      PATHOFLIBS:=      -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
+                        -L$(STLLIBPATH) \
+                        -L$(ZMLLIBPATH) \
+                        -L$(XMLLIBPATH) \
+                        -L$(OSAAPILIBPATH) \
+
+
+      CC_COMPILER:=     xlC
+
+      CC_INCLUDES:=     -I$(RELATIVE_SOURCE_DIR). \
+                        $(STLINCLUDES) \
+                        $(DYNGENINCLUDES) \
+                        $(ZMLINCLUDES) \
+                        $(XMLINCLUDES) \
+                        $(OSAAPIINCLUDES) \
+                        $(IDAINCLUDES)
+
+      CC_COMPFLAGS:=
+
+      override CC_COMPFLAGS:=$(CC_COMPFLAGS) -DAIX_4_3        
+
+      ifdef PROFILING
+        override CC_COMPFLAGS:=$(CC_COMPFLAGS) -pg
+      endif
+
+      CC_REPOSITORY:=   -qtempinc=$(TEMPLATEPATH)
+      CC_OPTIONS:=      -+
+      CC_FLAGS:=        -qtwolink $(DEBUGFLAGS) $(EXCEPTIONFLAGS) $(STLFLAGS) $(CC_COMPFLAGS) 
+
+      C_COMPILER:=      cc
+      C_INCLUDES:=      $(CC_INCLUDES)
+      C_FLAGS:=         $(DEBUGFLAGS) $(CC_COMPFLAGS) 
+      C_OPTIONS:=       -Ae -w
+
+    else      # AIX 4, but not 4.3
+error:
+	@echo Unsupported operating system: $(PLATFORMDIR)
+    endif
+
+  else 
+
+#
+################# AIX 5.2 specifics ###########################
+#
+    ifeq ($(OS_VERSION),5)
+
+      ifeq ($(OS_RELEASE),2)
+
+        STLFLAGS:=      -DOS_USE_CLASSLIB_STL_NAMES
+        PATHOFLIBS:=    -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
+                        -L$(ZMLLIBPATH) \
+                        -L$(XMLLIBPATH) \
+                        -L$(OSAAPILIBPATH) \
+
+
+        CC_COMPILER:= xlC
+
+
+        CC_INCLUDES:=   -I$(RELATIVE_SOURCE_DIR). \
+                        -I$(POOL)/stl/PCPSTL.01.01.14/include \
+                        $(ZMLINCLUDES) \
+                        $(THREADLIBINCLUDES) \
+                        $(DYNGENINCLUDES)  \
+                        $(XMLINCLUDES) \
+                        $(OSAAPIINCLUDES) \
+                        $(IDAINCLUDES)
+
+
+        CC_COMPFLAGS:=  -D_AIX $(STLFLAGS) -DIMPLICIT_BOOL_DEF -DOS_NO_CONST_MATCH
+
+        override CC_COMPFLAGS:=$(CC_COMPFLAGS) -D_AIX_5_2
+
+        ifdef PROFILING
+          override CC_COMPFLAGS:=$(CC_COMPFLAGS) -pg
+        endif
+
+        CC_REPOSITORY:=   -qtempinc=$(TEMPLATEPATH)
+        CC_OPTIONS:=      -+
+        CC_FLAGS:=        -qtwolink $(DEBUGFLAGS) $(EXCEPTIONFLAGS) $(CC_COMPFLAGS) 
+
+        C_COMPILER:=      cc
+        C_INCLUDES:=      $(CC_INCLUDES)
+        C_FLAGS:=         $(DEBUGFLAGS) $(CC_COMPFLAGS) 
+        C_OPTIONS:=       -Ae -w
+
+      else    # AIX5, but not 5.2
+error:
+	@echo Unsupported operating system: $(PLATFORMDIR)
+
+      endif
+
+    else      # AIX, but neither 4 nor 5
+error:
+	@echo Unsupported operating system: $(PLATFORMDIR)
+
+    endif
+
+  endif
+
+else
+
+
+#
+#################  HP specific settings #######################
+#
+
+  ifeq ($(UNAME), HP-UX)
+
+  export LDOPTS=+n
+
+#
+#################  UX 11 specifics ###########################
+#
+    ifeq ($(OS_VERSION), 11)
+
+      OSFLAG:=         -D_HPUX_11
+      STLFLAGS:=       -DROGUE_WAVE_STL -DOS_USE_CLASSLIB_STL_NAMES -DRWSTD_NO_NAMESPACE
+
+      PATHOFLIBS:=     -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
+                       -L/opt/aCC/lib \
+                       -L$(ZMLLIBPATH) \
+                       -L$(XMLLIBPATH) \
+                       -L$(OSAAPILIBPATH)
+
+      C_COMPILER:=     cc
+      C_COMPFLAGS:=    -D_HP -D_HP_COMP_ERR -DPOSIX $(MODELFLAG) $(OSFLAG) -U_SIZE_T +DAportable
+      C_OPTIONS:=      -w -Ae
+      C_INCLUDES:=     -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include \
+                       -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include/sys \
+                       -I$(RELATIVE_SOURCE_DIR). \
+                       $(ZMLINCLUDES) \
+                       $(XMLINCLUDES) \
+                       $(OSAAPIINCLUDES) \
+                       $(IDAINCLUDES)
+
+      C_FLAGS:=        $(DEBUGFLAGS) $(C_COMPFLAGS)
+
+      CC_COMPILER:=    aCC
+      CC_INCLUDES:=    $(C_INCLUDES) \
+                       -I/opt/aCC/include \
+                       $(STLINCLUDES) \
+                       $(DYNGENINCLUDES)
+
+
+      CC_COMPFLAGS:=   $(C_COMPFLAGS) $(STLFLAGS) -DIMPLICIT_BOOL_DEF
+
+      ifdef PROFILING
+        override CC_COMPFLAGS:= -G $(CC_COMPFLAGS)
+      endif
+
+      CC_REPOSITORY:=  +inst_implicit_include +inst_v -v
+      CC_OPTIONS:=
+      CC_FLAGS:=       $(DEBUGFLAGS) $(EXCEPTIONFLAGS) $(CC_COMPFLAGS)
+      CXX_FLAGS:=      +inst_close
+      LD_FLAGS:= -Wl,+s
+
+    else
+
+error::
+	@echo Unsupported operating system: $(PLATFORMDIR)
+
+    endif
+
+  else
+
+
+#
+#################  Linux specific settings #######################
+#
+
+    ifeq ($(UNAME), SuSE-Linux)
+
+          STLFLAGS:=        -DOS_USE_CLASSLIB_STL_NAMES
+
+          PATHOFLIBS:=      -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
+                            -L$(ZMLLIBPATH) \
+                            -L$(XMLLIBPATH) \
+		                      -L$(OSAAPILIBPATH)
+
+          CC_COMPILER:=     g++
+          CC_INCLUDES:=     -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include \
+                            -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include/sys \
+                            -I$(RELATIVE_SOURCE_DIR). \
+                            $(ZMLINCLUDES) \
+                            $(STLINCLUDES) \
+                            $(DYNGENINCLUDES) \
+                            $(XMLINCLUDES) \
+                       $(OSAAPIINCLUDES) \
+                       $(IDAINCLUDES)
+
+          CC_COMPFLAGS:=    -g -D_LINUX  $(STLFLAGS) -DIMPLICIT_BOOL_DEF -Wno-deprecated
+          ifdef OPTIMIZE
+            LD_FLAGS:=      -Wl,-O2,-s,-x
+          endif
+
+          ifdef PROFILING
+            override CC_COMPFLAGS:=$(CC_COMPFLAGS) -pg
+          endif
+
+          CC_REPOSITORY:=
+          CC_OPTIONS:=
+          CC_FLAGS:=        $(DEBUGFLAGS) $(EXCEPTIONFLAGS) $(CC_COMPFLAGS) 
+
+          C_COMPILER:=      gcc
+          C_INCLUDES:=      $(CC_INCLUDES)
+          C_FLAGS:=         $(DEBUGFLAGS) $(CC_COMPFLAGS) 
+          C_OPTIONS:=
+    else
+#
+#################  Windows specific settings #######################
+#
+      ifeq ($(UNAME), Windows)
+
+        OSFLAG:=          /D "_WINDOWS" /D "OS_WIN_32" /D "OS_USE_CLASSLIB_STL_NAMES" \
+                          /D "_WIN32_WINNT\#0x0400"
+        STLFLAGS:=
+
+        BIOSLIBS:=        netapi32.lib
+
+        PATHOFLIBS:=    
+
+        LDOUTFLAG:=       /out:
+
+        C_COMPILER:=      cl.exe
+        C_COMPFLAGS:=     $(OSFLAG) /U "_SIZE_T" /D "_MBCS" /D "WIN32" /c 
+        C_OPTIONS:=
+        C_INCLUDES:=      /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include \
+                          /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include/sys \
+                          /I$(RELATIVE_SOURCE_DIR). \
+                          $(ZMLINCLUDES) \
+                          $(STLINCLUDES) \
+                          $(DYNGENINCLUDES) \
+                       $(OSAAPIINCLUDES) \
+                       $(IDAINCLUDES)
+
+        C_FLAGS:=         $(DEBUGFLAGS) $(C_COMPFLAGS)
+
+        CC_COMPILER:=     cl.exe
+        CC_INCLUDES:=     $(C_INCLUDES) \
+                          $(REGEXPINCLUDES)
+
+
+        CC_COMPFLAGS:=    /nologo /W3 /GX /Oy- $(C_COMPFLAGS) /YX \
+                          $(STLFLAGS) /D"IMPLICIT_BOOL_DEF"
+
+        CC_REPOSITORY:=
+        CC_OPTIONS:=      /Gd
+        CC_FLAGS:=        $(DEBUGFLAGS) $(EXCEPTIONFLAGS) $(CC_COMPFLAGS)
+        CXX_FLAGS:=
+
+        LD:=              link.exe
+        WIN32_STD_LIBS:=  advapi32.lib \
+                          ws2_32.lib \
+                          user32.lib \
+                          psapi.lib \
+                          libregexp.lib
+
+        LD_FLAGS:=        /nologo \
+                          $(LDDEBUGFLAGS) \
+                          /machine:I386 \
+                          /LIBPATH:"$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH)" \
+                          /LIBPATH:"$(ZMLLIBPATH)" \
+                          /LIBPATH:"$(OSAAPILIBPATH)" \
+                          $(REGEX_LIBPATH) \
+                          $(STLLIBPATH) \
+                          /LIBPATH:"//obelix/winpool/pool/libs" \
+                          $(WIN32_STD_LIBS) \
+                          $(BIOSLIBS)
+        ifdef PROFILING
+          override LD_FLAGS:= /PROFILE $(LD_FLAGS)
+        endif
+
+      else
+error:
+	@echo Unknown operating system: $(PLATFORMDIR)
+
+
+      endif
+
+
+    endif
+
+
+  endif
+
+
+endif
+
+
+#
+#######################################################################
+#
+
+CC:=  cd $(PLATFORMDIR); $(CC_COMPILER) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS)
+
+cc:=  cd $(PLATFORMDIR); $(C_COMPILER) $(C_OPTIONS) $(C_FLAGS) $(C_INCLUDES) $(PATHOFLIBS)
+
+ifeq ($(UNAME),Windows)
+  EXE := .exe
+  LDOUT := /OUT:
+  LD:= cd $(PLATFORMDIR); $(LD) $(LD_FLAGS)
+else
+  EXE :=
+  LDOUT := -o
+  ifdef PURIFY
+    LD:=  cd $(PLATFORMDIR); purify $(CC_COMPILER) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS)
+  else
+    LD:=  cd $(PLATFORMDIR); $(CC_COMPILER) $(LD_FLAGS) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS)
+  endif
+endif
+
+
+CREATE_BIN= \
+  if [ ! -d $(MK_REL_BINPATH) ]; \
+  then \
+    rm -f $(MK_REL_BINPATH); \
+    mkdir $(MK_REL_BINPATH); \
+  fi
+
+RM_TEMPLATES=cd $(PLATFORMDIR); rm -f $(TEMPLATEPATH)/*; cd ..
+
+CC_REL_BINPATH=$(RELATIVE_SOURCE_DIR)/$(MK_REL_BINPATH)
+
+ifeq ($(UNAME), Windows)
+  OBJCOMLIBS_NP=objcom dynrouterframe dyngen pcpsocket ipc pcputil pcpdisp tracesystem 
+else
+  OBJCOMLIBS_NP=objcom ipc dynrouterframe dyngen pcpdisp pcpsocket pcputil tracesystem
+  LIBOSPACE= -lospace
+endif
+
+ifeq ($(UNAME), HP-UX)
+  override LIBOSPACE:=
+endif
+
+ifeq ($(UNAME), SuSE-Linux)
+  override LIBOSPACE:=
+endif
+
+ifeq ($(UNAME), AIX)
+  ifeq ($(OS_VERSION),5)
+    override LIBOSPACE:=
+  endif
+endif
+
+
+LIBRARIES = $(OBJCOMLIBS_NP)

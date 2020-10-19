@@ -1,0 +1,107 @@
+#!/bin/ksh
+
+#/*CB>---------------------------------------------------------------------
+#
+#File, Component, Release:
+#		bin/ida_stop 1.0 12-APR-2008 18:52:11 DMSYS
+#
+#File:      bin/ida_stop
+#Revision:      1.0
+#Date:          12-APR-2008 18:52:11
+#
+#Systemab.:
+#
+#DESCRIPTION:
+#
+#--------------------------------------------------------------------------
+#<CE*/
+#
+#SCCS_Id = "(#) bin/ida_stop 1.0 12-APR-2008 18:52:11 DMSYS"
+
+########################################################################
+#
+#  ida_stop   --   Stop ida group in the classlib system
+#
+########################################################################
+#  Usage:
+#
+#    ida_stop 
+#
+#  Exits-Values:
+#	0:	succesfully terminated, means group could be stopped
+#		succesfully
+#	1:not used
+#	2:not used
+#	3:not used
+#	4:not used
+#	5:	the group could not be stopped
+#
+#
+#
+########################################################################
+#  Description:
+#	IDA process group stop script.
+#	The classlib-runtime-enviroment will NOT be stopped
+#	If the group was not running or could be succesfully stopped
+#	a return-value of 0 is returned.
+#
+########################################################################
+#  Installation:
+#
+#
+########################################################################
+
+
+groupname=ida
+
+if [[ -z "${IDA_ROOT}" || ! -d "${IDA_ROOT}" ]]
+then
+        print "${0##*/}: IDA_ROOT undefined or invalid; cannot stop ${groupname}."
+        exit 5
+fi
+
+# check which classlib version will be used by the system. 
+# if it is CLASSLIB 2.20 then CLASSLIB_ROOT and CLASSLIB_LOGDIR will be used
+# it if is CLASSLIB 3.00 then CL_ROOT_PATH and CL_LOG_PATH will be used
+
+if [[ -n "${CLASSLIB_ROOT}" ]]
+then
+	 classlibRuntime="${CLASSLIB_ROOT}"
+    clVersion="02.20"
+    logDir="${CLASSLIB_LOGDIR}"
+else
+	 if [[ -n "${CL_ROOT_PATH}" ]]
+	 then
+		  classlibRuntime="${CL_ROOT_PATH}"
+		  clVersion="03.00"
+		  logDir="${CL_LOG_PATH}"
+	 else
+		  print "${0##*/}: CLASSLIB_ROOT and CL_ROOT_PATH undefined; cannot stop ${groupname}."
+		  exit 5
+	 fi
+fi
+
+if [[ ! -d "$classlibRuntime" ]]
+then
+        print "${0##*/}: $classlibRuntime invalid; cannot stop ${groupname}."
+        exit 5
+fi
+
+if [[ -z "$logDir" ]]
+then
+        cd "${IDA_ROOT}/log"
+else
+        cd "$logDir"
+fi
+
+svadmin stopgroup -group ${groupname}
+
+if (( $? == 0 ))
+	then
+	   print "${0##*/}: ${groupname} succesfully stopped !"
+	else
+	   print "${0##*/}: ${groupname} NOT succesfully stopped !"
+	   exit 5
+fi
+
+exit 0

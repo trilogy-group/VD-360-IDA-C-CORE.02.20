@@ -1,0 +1,441 @@
+#CB>-------------------------------------------------------------------
+# 
+#   File, Component, Release:
+#                  classlib/makefile.tail, classlib, ZMR.03.00, 51
+# 
+#   SCCSfile:      /cmvcadm/vc/0/2/0/1/s.50
+#   Revision:      1.65
+#   Date:          05/10/17
+# @(#) classlib/makefile.tail, classlib, ZMR.03.00, 51, 1.65
+
+.PHONY: depend clean auslieferung configinfo removerep removebin removelib $(BINARIES)
+.IGNORE:
+.SUFFIXES: .cc .c .o .a .C .obj .lib
+
+#
+#################  common settings  ############################################
+#
+
+#default
+all: setup target
+
+# mkdir etc
+setup: $(PLATFORMDIR) work_mode
+
+#directories: $(PLATFORMDIR) $(MAKELIBPATH) $(BINPATH) $(MODULESPATH)
+$(PLATFORMDIR): 
+	mkdir -p $@
+
+work_mode:
+	@echo ""
+	@echo "ZMLLIBPATH=" $(ZMLLIBPATH)
+	@echo ""
+
+AR = ar
+
+ifeq ($(UNAME), SuSE-Linux)
+define LINKOPS
+  $(RM_TEMPLATES)
+  $(CREATE_BIN)
+  $(LD) -Wl,--whole-archive $(^F) $(LINKLIBS) -lrt $(LDOUT)$(CC_REL_BINPATH)/$(@F) $(LIBOSPACE) 
+endef
+else
+  ifeq ($(UNAME),AIX)
+    ifeq ($(OS_VERSION),5)
+      define LINKOPS
+        $(RM_TEMPLATES)
+        $(CREATE_BIN)
+        $(LD) $(^F) $(LINKLIBS) $(LDOUT) $(CC_REL_BINPATH)/$(@F) -lpthread 
+      endef
+    else
+      define LINKOPS
+        $(RM_TEMPLATES)
+        $(CREATE_BIN)
+        $(LD) $(^F) $(LINKLIBS) $(LDOUT)$(CC_REL_BINPATH)/$(@F) $(LIBOSPACE)
+      endef
+    endif
+  else
+    define LINKOPS
+        $(RM_TEMPLATES)
+        $(CREATE_BIN)
+        $(LD) $(^F) $(LINKLIBS) $(LDOUT)$(CC_REL_BINPATH)/$(@F)
+    endef
+  endif
+endif
+
+
+ifeq ($(UNAME),Windows)
+  OBJCOMLIBS:=$(foreach filename, $(OBJCOMLIBS_NP),lib$(filename).lib) $(STLLIB)
+  ifeq ($(USEXML), usexml)
+    LIBXML:= libxmlapi.lib
+    LIBXML_NP:=xmlapi
+  else
+    LIBXML:=
+  endif
+else
+  OBJCOMLIBS:=$(foreach filename, $(OBJCOMLIBS_NP),-l$(filename))
+  ifeq ($(USEXML), usexml)
+    ifeq ($(UNAME), SuSE-Linux)
+      LIBXML:= -lxerces-c -lxmlapi -Wl,--no-whole-archive
+      LIBXML_NP:=xerces-c xmlapi 
+    else
+      LIBXML:= -lxerces-c -lxmlapi
+      LIBXML_NP:=xerces-c xmlapi
+    endif
+  else
+    LIBXML:=
+  endif
+endif
+
+override OBJCOMLIBS:=$(OBJCOMLIBS) $(LIBXML)
+override OBJCOMLIBS_NP:=$(OBJCOMLIBS_NP) $(LIBXML_NP)
+
+OBJCOMLIBS_DEP=$(ZMLLIBPATH)/libobjcom.a $(ZMLLIBPATH)/libipc.a $(ZMLLIBPATH)/libpcputil.a
+
+# Change MK_REL_BINPATH if it has the value . or ./ in order to avoid
+# circular dependecies
+
+ifeq ($(MK_REL_BINPATH),.)
+  MK_REL_BINPATH:=$(PLATFORMDIR)/..
+endif
+ifeq ($(MK_REL_BINPATH),./)
+  MK_REL_BINPATH:=$(PLATFORMDIR)/..
+endif
+
+#
+################# Rules and settings for library maintenance ###################
+#
+# These rules and settings are valid only if  $(LIBNAME) is set
+# Note: strip eliminates whitespaces
+
+ifneq ($(strip $(LIBNAME)),)
+  ifeq ($(UNAME), Windows)
+    PDBFILE = /Fd../$(MAKELIBPATH)/$(LIBNAME).pdb
+    LIBRARY = $(MAKELIBPATH)/$(LIBNAME).lib
+    LIBRARYREMOVE = $(MAKELIBPATH)/$(LIBNAME).*
+
+    # The following line was changed for d36660 
+    LIBOBJS = $(foreach filename, $(LIBSRCS), $(LIBRARY)($(filename).o))
+  else
+    LIBRARY = $(MAKELIBPATH)/$(LIBNAME).a
+    LIBRARYREMOVE = $(MAKELIBPATH)/$(LIBNAME).a
+    LIBOBJS = $(foreach filename, $(LIBSRCS), $(LIBRARY)($(filename).o))
+  endif
+
+#
+################ AIX specific settings #####################
+#
+
+  ifeq ($(UNAME), AIX)
+
+    ifeq ($(OS_VERSION),4)
+
+.cc.a:
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+.c.a:
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+
+# Extract objects from the library (this comprises also those put in in $(TEMPLATEPATH))
+# Assure that no unused stuff remains in the lib ( the previos ar xv keeps the lib unchanged)
+# Force instantiation of templates which results in several object files
+# Archive all object files of the current directory
+# If existing then archive all object files in $(TEMPLATEPATH)
+
+$(LIBRARY): $(LIBOBJS)
+	cd $(PLATFORMDIR); $(AR) -xv $(RELATIVE_SOURCE_DIR)$(LIBRARY)      
+	rm -f $(LIBRARY)          
+	$(CC)  *.o -oTMP.OBJ     
+	cd $(PLATFORMDIR); rm -f TMP.OBJ
+	$(AR) -rv $(LIBRARY) $(PLATFORMDIR)/*.o  
+	if [ -f $(PLATFORMDIR)/$(TEMPLATEPATH)/*.o ] ;\
+	  then $(AR) -rv $(LIBRARY) $(PLATFORMDIR)/$(TEMPLATEPATH)/*.o ;\
+	  rm -f $(PLATFORMDIR)/$(TEMPLATEPATH)/*.o ;\
+	fi
+	rm -f $(PLATFORMDIR)/*.o
+	@echo $(LIBRARY) fertig
+
+    endif
+
+    ifeq ($(OS_VERSION),5)
+
+.cc.a:
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+.c.a:
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+
+
+$(LIBRARY): $(LIBOBJS)
+	cd $(PLATFORMDIR); $(AR) -xv $(RELATIVE_SOURCE_DIR)$(LIBRARY)      
+	rm -f $(LIBRARY)          
+	$(AR) -rv $(LIBRARY) $(PLATFORMDIR)/*.o  
+	rm -f $(PLATFORMDIR)/*.o
+	@echo $(LIBRARY) fertig
+
+    endif
+
+  else        # Not AIX
+
+#
+####################  HP specific settings #################
+#
+
+    ifeq ($(UNAME), HP-UX)
+
+
+.cc.a:
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+.c.a:
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+
+# Extract objects from the library 
+# Force instantiation of templates which are appended to every object file
+# Archive all object files of the current directory and remove them
+# Note: CXX_FLAGS are set in every makefile for the +inst_close option
+
+$(LIBRARY): $(LIBOBJS)
+	cd $(PLATFORMDIR); $(AR) -xv $(RELATIVE_SOURCE_DIR)$(LIBRARY)
+	rm -f $(LIBRARY)
+	$(CC) -c $(INCLUDESCXX) $(CXX_FLAGS) *.o
+	$(AR) -rv $(LIBRARY) $(PLATFORMDIR)/*.o
+	rm -f $(PLATFORMDIR)/*.o
+	@echo $(LIBRARY) fertig
+
+    else      # Not HP-UX
+
+
+#
+################ Linux specific settings #####################
+#
+
+      ifeq ($(UNAME), SuSE-Linux)
+
+.cc.a:
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+.c.a:
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+
+
+$(LIBRARY): $(LIBOBJS)
+	cd $(PLATFORMDIR); $(AR) -xv $(RELATIVE_SOURCE_DIR)$(LIBRARY)      
+	rm -f $(LIBRARY)          
+	$(AR) -rv $(LIBRARY) $(PLATFORMDIR)/*.o  
+	rm -f $(PLATFORMDIR)/*.o
+	@echo $(LIBRARY) fertig
+
+      else    # Not Linux
+
+#
+####################  Windows specific settings #################
+#
+
+        ifeq ($(UNAME), Windows)
+
+.cc.a:
+	$(CC) $(PDBFILE) /Fo$(*F).o /Tp"$(RELATIVE_SOURCE_DIR)$<"
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+.c.a:
+	$(CC) $(PDBFILE) /Fo$(*F).o /Tc"$(RELATIVE_SOURCE_DIR)$<"
+	$(AR) rv $@ $(PLATFORMDIR)/$*.o
+	rm -f $(PLATFORMDIR)/$*.o
+
+# Extract objects from the library 
+# Force instantiation of templates which are appended to every object file
+# Archive all object files of the current directory and remove them
+
+$(LIBRARY): $(LIBOBJS)
+	cd $(PLATFORMDIR); $(AR) -xv $(RELATIVE_SOURCE_DIR)$(LIBRARY)      
+	rm -f $(LIBRARY)          
+	$(AR) -rv $(LIBRARY) $(PLATFORMDIR)/*.o  
+	rm -f $(PLATFORMDIR)/*.o
+	rm -f $(PLATFORMDIR)/*.pch
+	@echo "$(LIBRARY) fertig"
+
+# The following lines were changed for d36660 (replaced by the stuff above after the last ifeq)
+#$(LIBRARY): $(LIBOBJS)
+#	ar -rv $(LIBRARY) $?
+#	@echo $(LIBRARY) fertig
+
+        else  # Not Windows
+
+error:
+	@echo Unsupported platform $(PLATFORMDIR)
+
+        endif   # AIX
+
+      endif   # HP-UX
+
+    endif   # Linux
+
+  endif   # Windows
+
+endif   #($(strip $(LIBNAME)),)
+
+#
+################################################################################
+#
+
+ifeq ($(UNAME), Windows)
+#  EXECUTABLES1 = $(foreach filename, $(BINARIES), $(MK_REL_BINPATH)/$(filename).exe)
+#  EXECUTABLES2 = $(foreach filename, $(BINARIES), $(MK_REL_BINPATH)/$(filename).pdb)
+#  EXECUTABLES3 = $(foreach filename, $(BINARIES), $(MK_REL_BINPATH)/$(filename).ilk)
+  EXECUTABLES = $(foreach filename, $(BINARIES), $(MK_REL_BINPATH)/$(filename).*)
+
+
+  LINKLIBS1 := $(foreach filename, $(LIBRARIES),lib$(filename).lib)
+  LINKLIBS2 := $(foreach filename, $(LIBRARIES),lib$(filename).pdb)
+  LINKLIBS3 := $(foreach filename, $(LIBRARIES),lib$(filename).ilk)
+  LINKLIBS = $(foreach filename, $(LIBRARIES),lib$(filename).lib)
+#  LINKLIBS = $(LINKLIBS1) $(LINKLIBS2) $(LINKLIBS3)
+else
+  EXECUTABLES = $(foreach filename, $(BINARIES), $(MK_REL_BINPATH)/$(filename))
+  ifeq ($(UNAME), SuSE-Linux)
+    LINKLIBS1 = $(foreach filename, $(LIBRARIES), -l$(filename)) $(NETLIBS)
+    LINKLIBS = $(LINKLIBS1) 
+  else
+    LINKLIBS = $(foreach filename, $(LIBRARIES), -l$(filename)) $(NETLIBS)
+  endif
+endif
+
+#
+#################  common rules  ###############################################
+#
+
+
+target: $(LIBRARY) $(BINARIES)
+
+$(BINARIES): % : $(MK_REL_BINPATH)/%$(EXE)
+
+#.cc.o:
+#	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+#
+#.c.o:
+#	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+AIX43/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+AIX43/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+AIX52/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+AIX52/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+HP-UX11/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+HP-UX11/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+SuSE-Linux9/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux9/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+SuSE-Linux91/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux91/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+SuSE-Linux93/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux93/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux102/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux102/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux10/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux10/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+
+Windows2000/%.o :: %.cc
+	$(CC) $(PDBFILE) /Fo$(@F) /Tp"$(RELATIVE_SOURCE_DIR)$<"
+
+Windows2000/%.o :: %.c
+	$(CC) $(PDBFILE) /Fo$(@F) /Tc"$(RELATIVE_SOURCE_DIR)$<"
+
+#
+#################  Configuration  ###############################################
+#
+
+configinfo:
+	@echo "UNAME=$(UNAME)"
+	@echo "MODEL=$(MODEL)"
+	@echo "STLPATH=$(STLPATH)"
+	@echo "ZMLPATH=$(ZMLPATH)"
+	@echo "DYNGENPATH=$(DYNGENPATH)"
+#
+#################  cleanup rules  ###############################################
+#
+# Note: a rule which triggers rm will only be included if the respective variable is set,
+#       which will preserve unintended removals
+
+ifneq ($(strip $(TEMPLATEPATH)),)
+removerep:
+	cd $(PLATFORMDIR); rm -rf $(TEMPLATEPATH)
+else
+removerep:
+endif
+
+ifneq ($(strip $(BINARIES)),)
+removebin:
+	rm -f $(EXECUTABLES)
+else
+removebin:
+endif
+
+ifneq ($(strip $(LIBRARY)),)
+removelib:
+	rm -rf $(LIBRARYREMOVE)
+else
+removelib:
+endif
+
+ifeq ($(UNAME),Windows)
+clean: removerep removebin removelib
+	rm -f  $(PLATFORMDIR)/*
+#	cd $(PLATFORMDIR); rm -f *.o
+#	cd $(PLATFORMDIR); rm -f *.pdb
+#	cd $(PLATFORMDIR); rm -f *.pch
+#	cd $(PLATFORMDIR); rm -f *.idb
+else
+clean: removerep removebin removelib
+	cd $(PLATFORMDIR); rm -f *.o
+	cd $(PLATFORMDIR); rm -f *.I
+endif
+
+-include makefile.dep    # -include does not generate a warning if the file is missing

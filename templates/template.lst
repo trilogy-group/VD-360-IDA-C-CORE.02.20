@@ -1,0 +1,8 @@
+// IDA files
+idaprocs.par 	config
+
+// classlib
+ida_reporter.par	classlib
+osa.env			   classlib
+productgroups.par	classlib
+

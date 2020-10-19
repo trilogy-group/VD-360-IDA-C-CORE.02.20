@@ -1,0 +1,82 @@
+//CB>-------------------------------------------------------------------
+//
+//   File, Component, Release:
+//                  dat/ida.rtd, ypBase, IDA.01.02, 05
+//
+//   SCCSfile:      /home/wssrv/cmvcadm/vc/0/4/2/1/s.76
+//   Revision:      1.4
+//   Date:          96/08/08
+//
+//   DESCRIPTION:
+//	report text definitions for the reports of IDA processes:
+//  	IDA_CGI_Process, IDA_Query_Manager, IDA_TDS_Client
+//
+//<CE-------------------------------------------------------------------
+#220
+
+// Alarm
+1=send failed:
+2=IDA shared memory creation failed
+3=IDA TdfAccess not found for DBID 
+4=registration aborted after max. attempts
+5=could not start search timer: 
+7=not all mandatory items are set:
+8=could not start register timer:
+9=cannot read osaTicket file, DBID
+10=create TdfArgument for search request failed
+11=create TdfArgument for delete request failed
+12=create TdfArgument for modify request failed
+14=could not read parameter file
+15=ftok for shared memory failed
+16=data for TdfProcess group missing
+
+// Problem
+101=request generation failed:
+102=timeout within WebProcess
+103=connection closed by servlet
+104=failed to send response to WebProcess
+105=could not find corresponding request
+107=TDF search argument generation failed:
+108=response generation failed:
+109=timeout during TDF registration
+110=timeout within TdfProcess
+111=error sending registerRequest
+112=send of search request failed: 
+115=Max registration limit exceeded for DBID 
+116=deRegisterIndication received from TDF_OTG    
+117=statusReportIndication >server not available< received from TDF_OTG   
+118=error sending deRegisterRequest to TDF_OTG
+119=attempt to establish more than one connection on a socket
+120=registerRequest failed
+121=request refused:
+
+// Event
+201=started process:
+202=end process:
+203=service available: 
+204=request received from IDA Servlet
+205=request received from WebProcess
+206=request sent to TdfAccess
+207=receiving response from TdfAccess complete
+208=response sent to IDA_CGI_Handler
+209=TdfAccess checked in, DBID:
+210=TdfAccess checked out, DBID:
+211=registration startet
+212=registerConfirmation received
+213=deRegisterRequest sent
+214=deRegisterConfirmation received from TDF_OTG, DBID:
+215=statusReportIndication received
+216=request received from IDA_Query_Handler
+217=request sent to TDF_OTG
+218=response received from TDF_OTG
+219=response sent to IDA_Query_Handler
+220=all channels busy, request queued in waiting list
+221=search request sent to TDF_OTG
+222=database delete request sent to TDF_OTG
+223=database modify request sent to TDF_OTG
+224=search confirmation response received from TDF_OTG
+231=deRegisterReportIndication from TDF Server
+232=handle TDF error
+234=reject response sent to WebProcess
+235=response from SesProcess
+236=sending SES autentication aknowledge
