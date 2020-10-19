@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BuildInfo xmlns="http://voltdelta.net/QA/BuildInfo.xsd" xmlns:bi="http://voltdelta.net/QA/BuildInfo.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://voltdelta.net/QA/BuildInfo.xsd
+\\schwarz\scriptpool\buildinfo\BuildInfo.xsd">
+	<!--Note that for processing reasons attributes need to be qualified. This is not automatic with the use of a default namespace!-->
+	<CopyRight>
+    # This software is distributed only by license
+    #  Copyright© 2003-2008 by Volt Delta International. All Rights Reserved
+  </CopyRight>
+	<Software bi:softwareName="ida 02.20" bi:projectId="IDA-C-CORE.02.20" bi:buildId="010.7"/>
+	<SoftwareDependencies>
+		<SourceEnvironment>
+			<Sources>
+				<Source bi:projectId="IDA-C-CORE.02.20" bi:baselineNumber="010"/>
+			</Sources>
+			<Libraries>
+				<Library bi:softwareName="classlib 03.00" bi:projectId="CL-LIBS.03.00" bi:buildId="137.7"/>
+				<Library bi:softwareName="pcpstl 02.00" bi:projectId="CL-STL.02.00" bi:buildId="001.7"/>
+				<Library bi:softwareName="osaapi 02.00" bi:projectId="OSAAPI-OSAAPI.02.00" bi:buildId="068.137.7" />
+			</Libraries>
+			<ExternalLibraries>
+				<ExternalLibrary bi:name="xerces" bi:version="02.07.00"/>
+			</ExternalLibraries>
+		</SourceEnvironment>
+		<BuildEnvironment>
+			<BuildScript>
+				<DimProjName bi:projectId="IDA-C-CORE.02.20" />
+				<FileName>build.pl</FileName>
+				<!-- file name with full path information within the dimensions project -->
+				<CommandLine>build.pl</CommandLine>
+			</BuildScript>
+         <OperatingSystem>SuSE Linux Enterprise Server 10</OperatingSystem>
+			<CompilerInformation>
+				<Item>g++ (GCC) 4.1.2 20070115 (prerelease) (SUSE Linux)</Item>
+			</CompilerInformation>
+		</BuildEnvironment>
+		<RuntimeEnvironment>
+         <OperatingSystem>SuSE Linux Enterprise Server 10</OperatingSystem>
+			<CompilerInformation>
+				<Item>g++ (GCC) 4.1.2 20070115 (prerelease) (SUSE Linux)</Item>
+			</CompilerInformation>
+			<Compatibilites/>
+			<Incompatibilites/>
+		</RuntimeEnvironment>
+	</SoftwareDependencies>
+</BuildInfo>
+
+
