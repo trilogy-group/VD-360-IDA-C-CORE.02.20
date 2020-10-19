@@ -4,18 +4,18 @@
 //CB>---------------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  TdfProcess/IdaRequestContainer.h 1.0 12-APR-2008 18:52:12 DMSYS
+//                  IdaRequestContainer.h 1.1
 // 
-//   File:      TdfProcess/IdaRequestContainer.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      IdaRequestContainer.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:07:40
 // 
 //   DESCRIPTION:
 //
 //     
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaRequestContainer_h = "@(#) TdfProcess/IdaRequestContainer.h 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_IdaRequestContainer_h = "@(#) IdaRequestContainer.h 1.1";
 
 
 

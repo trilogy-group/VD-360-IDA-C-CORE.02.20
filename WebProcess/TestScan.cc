@@ -1,11 +1,11 @@
 //CB>-------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  WebProcess/TestScan.cc 1.0 12-APR-2008 18:52:12 DMSYS
+//                  TestScan.cc 1.1
 // 
-//   File:      WebProcess/TestScan.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      TestScan.cc
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:57
 // 
 //   DESCRIPTION:
 //     Test program for YpHtmlScanner.
@@ -18,7 +18,7 @@
 //   
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_YpHtmlScanner_cc = "@(#) WebProcess/TestScan.cc 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_YpHtmlScanner_cc = "@(#) TestScan.cc 1.1";
 
 
 

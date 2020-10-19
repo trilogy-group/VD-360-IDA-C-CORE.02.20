@@ -2,11 +2,11 @@
 //CB>---------------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/IdaTdfProcessMain.cc 1.0 12-APR-2008 18:52:10 DMSYS
+//                  IdaTdfProcessMain.cc 1.1
 //
-//   File:      TdfProcess/IdaTdfProcessMain.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:10
+//   File:      IdaTdfProcessMain.cc
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:16
 //
 //   DESCRIPTION:
 //
@@ -17,7 +17,7 @@
 
 
 
-static const char * SCCS_Id_IdaTdfProcessMain_cc = "@(#) TdfProcess/IdaTdfProcessMain.cc 1.0 12-APR-2008 18:52:10 DMSYS";
+static const char * SCCS_Id_IdaTdfProcessMain_cc = "@(#) IdaTdfProcessMain.cc 1.1";
 
 
 //--------------------- include files ------------------------------------

@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  TdfProcess/IdaTdfChannelMgr.h 1.0 12-APR-2008 18:52:11 DMSYS
+//                  IdaTdfChannelMgr.h 1.1
 // 
-//   File:      TdfProcess/IdaTdfChannelMgr.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   File:      IdaTdfChannelMgr.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:13
 // 
 //   DESCRIPTION:
 //     Administration of TDF channels within IDA TDF client.
@@ -17,7 +17,7 @@
 //     
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaTdfChannelMgr_h = "@(#) TdfProcess/IdaTdfChannelMgr.h 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaTdfChannelMgr_h = "@(#) IdaTdfChannelMgr.h 1.1";
 
 
 

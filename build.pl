@@ -12,12 +12,13 @@
 ########################################################################
 #  Description:
 #
-#    This is the build script for the classlib ZMR libraries, binaries
-#    and modules.
+#    This is the build script for the ida libraries and modules.
 #
 ########################################################################
 #
-#    Version date:     Item A148078.A
+#    File:         build.pl
+#    Revision:     1.3
+#    Version date: 17-NOV-2010 10:13:41
 #
 ########################################################################
 #
@@ -32,6 +33,7 @@ initialize();
 setLogFileName();
 
 getArguments();
+createStructure();
 
 my $pool;
 my $scriptpool;
@@ -94,8 +96,6 @@ if ($compile eq "no")
   {
      exit;
   }
-
-createStructure();
 
 
 if ($compile eq "yes")

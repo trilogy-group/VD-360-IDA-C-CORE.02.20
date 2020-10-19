@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  WebProcess/IdaWebProcess.h 1.0 12-APR-2008 18:52:13 DMSYS
+//                  IdaWebProcess.h 1.1
 //
-//   File:      WebProcess/IdaWebProcess.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:13
+//   File:      IdaWebProcess.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:46
 //
 //   DESCRIPTION:
 //     IDA.plus Web interface.
@@ -17,7 +17,7 @@
 //
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaWebProcess_h = "@(#) WebProcess/IdaWebProcess.h 1.0 12-APR-2008 18:52:13 DMSYS";
+static const char * SCCS_Id_IdaWebProcess_h = "@(#) IdaWebProcess.h 1.1";
 
 #include <pcpdefs.h>
 #include <pcpstring.h>

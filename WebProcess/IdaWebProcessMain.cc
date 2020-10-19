@@ -1,11 +1,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  WebProcess/IdaWebProcessMain.cc 1.0 12-APR-2008 18:52:13 DMSYS
+//                  IdaWebProcessMain.cc 1.1
 //
-//   File:      WebProcess/IdaWebProcessMain.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:13
+//   File:      IdaWebProcessMain.cc
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:13:51
 //
 //   DESCRIPTION:
 //     IDA.plus Web process main program.
@@ -14,7 +14,7 @@
 //
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaWebProcess_cc = "@(#) WebProcess/IdaWebProcessMain.cc 1.0 12-APR-2008 18:52:13 DMSYS";
+static const char * SCCS_Id_IdaWebProcess_cc = "@(#) IdaWebProcessMain.cc 1.1";
 
 
 #include <IdaDecls.h>

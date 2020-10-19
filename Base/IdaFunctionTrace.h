@@ -4,17 +4,17 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  Base/IdaFunctionTrace.h 1.0 12-APR-2008 18:52:10 DMSYS
+//                  IdaFunctionTrace.h 1.1
 //
-//   File:      Base/IdaFunctionTrace.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:10
+//   File:      IdaFunctionTrace.h
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:55
 //
 //   DESCRIPTION:
 //
 //
 //<CE-------------------------------------------------------------------
-static const char * SCCS_Id_IdaFunctionTrace_h = "@(#) Base/IdaFunctionTrace.h 1.0 12-APR-2008 18:52:10 DMSYS";
+static const char * SCCS_Id_IdaFunctionTrace_h = "@(#) IdaFunctionTrace.h 1.1";
 
 
 #include <pcpstring.h>

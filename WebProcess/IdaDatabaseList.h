@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  WebProcess/IdaDatabaseList.h 1.0 12-APR-2008 18:52:12 DMSYS
+//                  IdaDatabaseList.h 1.1
 //
-//   File:      WebProcess/IdaDatabaseList.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      IdaDatabaseList.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:44
 //
 //   DESCRIPTION:
 //
@@ -16,7 +16,7 @@
 //<CE-------------------------------------------------------------------
 
 
-static const char * SCCS_Id_IdaDatabaseList_h = "@(#) WebProcess/IdaDatabaseList.h 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_IdaDatabaseList_h = "@(#) IdaDatabaseList.h 1.1";
 
 
 

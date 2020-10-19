@@ -2,11 +2,11 @@
 //CB>---------------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/IdaTdfChannel.cc 1.0 12-APR-2008 18:52:12 DMSYS
+//                  IdaTdfChannel.cc 1.1
 //
-//   File:      TdfProcess/IdaTdfChannel.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      IdaTdfChannel.cc
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:10
 //
 //   DESCRIPTION:
 //     Representation of one TDF channel.
@@ -15,7 +15,7 @@
 //
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaTdfChannel_cc = "@(#) TdfProcess/IdaTdfChannel.cc 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_IdaTdfChannel_cc = "@(#) IdaTdfChannel.cc 1.1";
 
 
 

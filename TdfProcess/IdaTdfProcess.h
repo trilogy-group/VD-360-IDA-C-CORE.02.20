@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/IdaTdfProcess.h 1.0 12-APR-2008 18:52:10 DMSYS
+//                  IdaTdfProcess.h 1.1
 //
-//   File:      TdfProcess/IdaTdfProcess.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:10
+//   File:      IdaTdfProcess.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:15
 //
 //   DESCRIPTION:
 //
@@ -18,7 +18,7 @@
 
 
 
-static const char * SCCS_Id_IdaTdfProcess_h = "@(#) TdfProcess/IdaTdfProcess.h 1.0 12-APR-2008 18:52:10 DMSYS";
+static const char * SCCS_Id_IdaTdfProcess_h = "@(#) IdaTdfProcess.h 1.1";
 
 
 //--------------------- include files ------------------------------------

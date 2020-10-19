@@ -2,11 +2,11 @@
 //CB>---------------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  TdfProcess/IdaDomErrorHandler.cc 1.0 12-APR-2008 18:52:11 DMSYS
+//                  IdaDomErrorHandler.cc 1.1
 // 
-//   File:      TdfProcess/IdaDomErrorHandler.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   File:      IdaDomErrorHandler.cc
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:56
 // 
 //   DESCRIPTION:
 //     
@@ -14,7 +14,7 @@
 //   
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaDomErrorHandler_cc = "@(#) TdfProcess/IdaDomErrorHandler.cc 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaDomErrorHandler_cc = "@(#) IdaDomErrorHandler.cc 1.1";
 
 
 #include <stdlib.h>

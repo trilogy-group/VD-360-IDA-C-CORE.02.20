@@ -1,11 +1,11 @@
 //CB>-------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  Base/IdaTraceMgr.cc 1.0 12-APR-2008 18:52:11 DMSYS
+//                  IdaTraceMgr.cc 1.1
 //
-//   File:      Base/IdaTraceMgr.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   File:      IdaTraceMgr.cc
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:56
 // 
 //   DESCRIPTION:
 //     Handles command line trace control settings.
@@ -13,7 +13,7 @@
 //     
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaTraceMgr_cc = "@(#) Base/IdaTraceMgr.cc 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaTraceMgr_cc = "@(#) IdaTraceMgr.cc 1.1";
 
 
 #include <IdaTraceMgr.h>

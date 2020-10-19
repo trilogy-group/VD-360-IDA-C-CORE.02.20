@@ -3,11 +3,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  Base/IdaXmlTags.h 1.0 12-APR-2008 18:52:12 DMSYS
+//                  IdaXmlTags.h 1.1
 //
-//   File:      Base/IdaXmlTags.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      IdaXmlTags.h
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:57
 //
 //   DESCRIPTION:
 //
@@ -16,7 +16,7 @@
 //<CE-------------------------------------------------------------------
 
 
-static const char * SCCS_Id_IdaXmlTags_h = "@(#) Base/IdaXmlTags.h 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_IdaXmlTags_h = "@(#) IdaXmlTags.h 1.1";
 
 
 //	Für die Erzeugung eines XML-Dokumentes:

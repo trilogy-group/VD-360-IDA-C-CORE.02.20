@@ -47,11 +47,11 @@
 //CB>---------------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  TdfProcess/IdaStringToEnum.h 1.0 12-APR-2008 18:52:11 DMSYS
+//                  TdfProcessgencode.pl 1.0 12-APR-2008 18:52:13 DMSYS
 //
-//   File:      TdfProcess/IdaStringToEnum.h
+//   File:      TdfProcessgencode.pl
 //   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   Date:          12-APR-2008 18:52:13
 //
 //   DESCRIPTION:
 //     
@@ -61,7 +61,7 @@
 //
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaStringToEnum_h = "@(#) TdfProcess/IdaStringToEnum.h 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaStringToEnum_h = "@(#) TdfProcessgencode.pl 1.0 12-APR-2008 18:52:13 DMSYS";
 
 
 // You can not instanciate this class
@@ -79,19 +79,6 @@ class StringToEnum
 	     invalid = 0xFFFFFFFF
       };
 
-	static ReturnStatus enumOfOperation(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfAttributeId(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfSearchAttr(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfProtocol(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfSpecialAddress(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfProduct(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfLanguage(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfCharacterSet(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfSearchType(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfSearchVar(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfExpansion(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfRequestedFormat(ULong& enumValue, const char* strValue);
-	static ReturnStatus enumOfDbAttribute(ULong& enumValue, const char* strValue);
 };
 
  

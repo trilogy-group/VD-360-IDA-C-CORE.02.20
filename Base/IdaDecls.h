@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  Base/IdaDecls.h 1.0 12-APR-2008 18:52:11 DMSYS
+//                  IdaDecls.h 1.1
 //
-//   File:      Base/IdaDecls.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   File:      IdaDecls.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:13:40
 //
 //   DESCRIPTION:
 //     Declaration of variables used in IDA main parameter file.
@@ -16,7 +16,7 @@
 //
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaDecls_h = "@(#) Base/IdaDecls.h 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaDecls_h = "@(#) IdaDecls.h 1.1";
 
 
 #include <strstream.h>

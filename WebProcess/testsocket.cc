@@ -1,11 +1,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  WebProcess/testsocket.cc 1.0 12-APR-2008 18:52:12 DMSYS
+//                  testsocket.cc 1.1
 //
-//   File:      WebProcess/testsocket.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:12
+//   File:      testsocket.cc
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:08:49
 //
 //   DESCRIPTION:
 //     Programm to test socket interface if IDA_CGI_Process
@@ -18,7 +18,7 @@
 //
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_testsocket_cc = "@(#) WebProcess/testsocket.cc 1.0 12-APR-2008 18:52:12 DMSYS";
+static const char * SCCS_Id_testsocket_cc = "@(#) testsocket.cc 1.1";
 
 
 #include "streamsocketdata.h"

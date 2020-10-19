@@ -2,11 +2,11 @@
 //CB>---------------------------------------------------------------------------
 // 
 //   File, Component, Release:
-//                  TdfProcess/IdaRequestContainer.cc 1.0 12-APR-2008 18:52:11 DMSYS
+//                  IdaRequestContainer.cc 1.1
 // 
-//   File:      TdfProcess/IdaRequestContainer.cc
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:11
+//   File:      IdaRequestContainer.cc
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:01:32
 // 
 //   DESCRIPTION:
 //     
@@ -15,7 +15,7 @@
 //   
 //<CE---------------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaRequestContainer_cc = "@(#) TdfProcess/IdaRequestContainer.cc 1.0 12-APR-2008 18:52:11 DMSYS";
+static const char * SCCS_Id_IdaRequestContainer_cc = "@(#) IdaRequestContainer.cc 1.1";
 
 
 #include <IdaDecls.h>

@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Component, Release:
-//                  Base/IdaTypes.h 1.0 12-APR-2008 18:52:10 DMSYS
+//                  IdaTypes.h 1.1
 //
-//   File:      Base/IdaTypes.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:10
+//   File:      IdaTypes.h
+//   Revision:  1.1
+//   Date:      09-JAN-2009 09:42:55
 //
 //   DESCRIPTION:
 //     Yellow Page wide used constants and types.
@@ -16,7 +16,7 @@
 //
 //<CE-------------------------------------------------------------------
 
-static const char * SCCS_Id_IdaTypes_h = "@(#) Base/IdaTypes.h 1.0 12-APR-2008 18:52:10 DMSYS";
+static const char * SCCS_Id_IdaTypes_h = "@(#) IdaTypes.h 1.1";
 
 
 class Types

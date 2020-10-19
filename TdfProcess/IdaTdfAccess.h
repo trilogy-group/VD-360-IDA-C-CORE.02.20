@@ -4,11 +4,11 @@
 //CB>-------------------------------------------------------------------
 //
 //   File, Compoponent, Release:
-//                  TdfProcess/IdaTdfAccess.h 1.0 12-APR-2008 18:52:13 DMSYS
+//                  IdaTdfAccess.h 1.1
 //
-//   File:      TdfProcess/IdaTdfAccess.h
-//   Revision:      1.0
-//   Date:          12-APR-2008 18:52:13
+//   File:      IdaTdfAccess.h
+//   Revision:  1.1
+//   Date:      17-NOV-2010 10:13:47
 //
 //   DESCRIPTION:
 //
@@ -19,7 +19,7 @@
 
 
 
-static const char * SCCS_Id_IdaTdfAccess_h = " (#) TdfProcess/IdaTdfAccess.h 1.0 12-APR-2008 18:52:13 DMSYS";
+static const char * SCCS_Id_IdaTdfAccess_h = " (#) IdaTdfAccess.h 1.1";
 
 
 #include <pcpdefs.h>
