@@ -106,7 +106,7 @@ ifndef RELATIVE_SOURCE_DIR
 endif
 
 ifndef PLATFORMDIR
-  PLATFORMDIR=$(UNAME)$(OS_VERSION)$(OS_RELEASE)
+  PLATFORMDIR=$(UNAME)$(OS_VERSION)
 endif
 
 ifndef BINPATH
@@ -196,6 +196,13 @@ endif
 ################ optimize specific settings  #######################
 #
 
+ARCH_FLAGS:=
+ifdef ARCH_32bit
+  ifeq ($(ARCH_32bit), 1)
+    ARCH_FLAGS:=-m32
+  endif
+endif
+
 ifdef OPTIMIZE
   ifeq ($(UNAME), Windows)
     DEBUGFLAGS:=/O2 /D "NDEBUG" /MD
@@ -255,16 +262,19 @@ ifeq ($(UNAME),Windows)
   DYNGENINCLUDES:=/I$(CLHOME)/dyngen/include
   OSAAPIINCLUDES:=/I$(OSAAPIHOME)/include /I$(OSAAPIHOME)/tdframe 
   IDAINCLUDES:=/I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/Base /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/TdfProcess /I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/WebProcess 
+  EXTRALIBS:=	
 else
   ZMLINCLUDES:=-I$(CLHOME)/include 
   DYNGENINCLUDES:=-I$(CLHOME)/dyngen/include
   OSAAPIINCLUDES:=-I$(OSAAPIHOME)/include -I$(OSAAPIHOME)/tdframe
   IDAINCLUDES:=-I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/Base -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/TdfProcess -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/WebProcess 
   XMLINCLUDES:=-I$(XERCESHOME)/include/xercesc \
-	            -I$(XERCESHOME)/include
+	              -I$(XERCESHOME)/include
   XMLLIBPATH:=$(XERCESHOME)/lib
+  ICUINCLUDES:=$(ICUHOME)/include
+  ICULIBPATH:=$(ICUHOME)/lib
+  EXTRALIBS:=	-lpthread -licui18n_varetis -licuuc_varetis -licudata_varetis
 endif
-
 
 #
 #################  AIX specific settings #######################
@@ -285,6 +295,7 @@ ifeq ($(UNAME), AIX)
                         -L$(STLLIBPATH) \
                         -L$(ZMLLIBPATH) \
                         -L$(XMLLIBPATH) \
+                        -L$(ICULIBPATH) \
                         -L$(OSAAPILIBPATH) \
 
 
@@ -295,6 +306,7 @@ ifeq ($(UNAME), AIX)
                         $(DYNGENINCLUDES) \
                         $(ZMLINCLUDES) \
                         $(XMLINCLUDES) \
+                        $(ICUINCLUDES) \
                         $(OSAAPIINCLUDES) \
                         $(IDAINCLUDES)
 
@@ -333,6 +345,7 @@ error:
         PATHOFLIBS:=    -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
                         -L$(ZMLLIBPATH) \
                         -L$(XMLLIBPATH) \
+                        -L$(ICULIBPATH) \
                         -L$(OSAAPILIBPATH) \
 
 
@@ -345,6 +358,7 @@ error:
                         $(THREADLIBINCLUDES) \
                         $(DYNGENINCLUDES)  \
                         $(XMLINCLUDES) \
+                        $(ICUINCLUDES) \
                         $(OSAAPIINCLUDES) \
                         $(IDAINCLUDES)
 
@@ -403,6 +417,7 @@ else
                        -L/opt/aCC/lib \
                        -L$(ZMLLIBPATH) \
                        -L$(XMLLIBPATH) \
+                       -L$(ICULIBPATH) \
                        -L$(OSAAPILIBPATH)
 
       C_COMPILER:=     cc
@@ -413,6 +428,7 @@ else
                        -I$(RELATIVE_SOURCE_DIR). \
                        $(ZMLINCLUDES) \
                        $(XMLINCLUDES) \
+                       $(ICUINCLUDES) \
                        $(OSAAPIINCLUDES) \
                        $(IDAINCLUDES)
 
@@ -458,7 +474,8 @@ error::
           PATHOFLIBS:=      -L$(RELATIVE_SOURCE_DIR)$(MAKELIBPATH) \
                             -L$(ZMLLIBPATH) \
                             -L$(XMLLIBPATH) \
-		                      -L$(OSAAPILIBPATH)
+                            -L$(ICULIBPATH) \
+                            -L$(OSAAPILIBPATH)
 
           CC_COMPILER:=     g++
           CC_INCLUDES:=     -I$(RELATIVE_SOURCE_DIR)$(RELATIVEROOTDIR)/include \
@@ -468,10 +485,10 @@ error::
                             $(STLINCLUDES) \
                             $(DYNGENINCLUDES) \
                             $(XMLINCLUDES) \
-                       $(OSAAPIINCLUDES) \
-                       $(IDAINCLUDES)
+                            $(OSAAPIINCLUDES) \
+                            $(IDAINCLUDES)
 
-          CC_COMPFLAGS:=    -g -D_LINUX  $(STLFLAGS) -DIMPLICIT_BOOL_DEF -Wno-deprecated
+          CC_COMPFLAGS:=    -g -D_LINUX -D_GCC4 $(STLFLAGS) -DIMPLICIT_BOOL_DEF -Wno-deprecated $(ARCH_FLAGS)
           ifdef OPTIMIZE
             LD_FLAGS:=      -Wl,-O2,-s,-x
           endif
@@ -586,9 +603,9 @@ else
   EXE :=
   LDOUT := -o
   ifdef PURIFY
-    LD:=  cd $(PLATFORMDIR); purify $(CC_COMPILER) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS)
+    LD:=  cd $(PLATFORMDIR); purify $(CC_COMPILER) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS) $(EXTRALIBS)
   else
-    LD:=  cd $(PLATFORMDIR); $(CC_COMPILER) $(LD_FLAGS) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS)
+    LD:=  cd $(PLATFORMDIR); $(CC_COMPILER) $(LD_FLAGS) $(CC_OPTIONS) $(CC_REPOSITORY) $(CC_FLAGS) $(CC_INCLUDES) $(PATHOFLIBS) $(EXTRALIBS)
   endif
 endif
 

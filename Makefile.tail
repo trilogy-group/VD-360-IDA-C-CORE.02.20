@@ -348,6 +348,11 @@ HP-UX11/%.o :: %.cc
 HP-UX11/%.o :: %.c
 	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
 
+RH-Linux6/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+RH-Linux6/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
 
 SuSE-Linux9/%.o :: %.cc
 	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
@@ -379,6 +384,12 @@ SuSE-Linux10/%.o :: %.cc
 	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
 
 SuSE-Linux10/%.o :: %.c
+	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux12/%.o :: %.cc
+	$(CC) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
+
+SuSE-Linux12/%.o :: %.c
 	$(cc) -c $(RELATIVE_SOURCE_DIR)$< -o $*.o
 
 

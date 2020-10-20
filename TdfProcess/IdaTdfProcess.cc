@@ -145,7 +145,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
                    sysParam.getErrorEnvironment().cString()));
 		
 		#ifdef MONITORING
-			cout << "sysParam.readDeclaration(idaDecls) failed" << endl;
+			std::cout << "sysParam.readDeclaration(idaDecls) failed" << std::endl;
 		#endif
 		
 		return isNotOk;
@@ -154,7 +154,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
     // Read parameter file
 
 	#ifdef MONITORING
-		cout << "parFileName = " << parFileName.cString() << endl;
+		std::cout << "parFileName = " << parFileName.cString() << std::endl;
 	#endif
 
 	idaTrackData(("parFileName = %s", parFileName.cString()));
@@ -165,7 +165,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
 		idaTrackFatal(("TdfProcess::initialize : creating infilestream failed"));
 		
 		#ifdef MONITORING
-			cout << "creation of \"ifstream parFile()\" failed" << endl;
+			std::cout << "creation of \"ifstream parFile()\" failed" << std::endl;
 		#endif
 		
 		return isNotOk;
@@ -177,7 +177,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
                    sysParam.getErrorEnvironment().cString()));
 		
 		#ifdef MONITORING
-			cout << "sysParam.readAllParams(parFile) failed" << endl;
+			std::cout << "sysParam.readAllParams(parFile) failed" << std::endl;
 		#endif
 		
 		return isNotOk;
@@ -233,7 +233,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
 	{
 		idaTrackTrace(("TdfProcess::initialize : Cannot access group \"TimerAndMaxValueGroup\""));
 		#ifdef MONITORING
-			cout << "Cannot access group \"TimerAndMaxValueGroup\"" << endl;
+			std::cout << "Cannot access group \"TimerAndMaxValueGroup\"" << std::endl;
 		#endif
 	}
 
@@ -241,15 +241,15 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
 
 
 	// -------------------------------------------------------------------------
-	// Basis OID für den WebProcess holen. Auf diesen wird später für jede
-	// Prozeß-Instanz ein entsprechender Offset hinzu addiert.
+	// Basis OID fï¿½r den WebProcess holen. Auf diesen wird spï¿½ter fï¿½r jede
+	// Prozeï¿½-Instanz ein entsprechender Offset hinzu addiert.
     SysParamGroup webProcessGroup("WebProcessGroup", true);
     if (sysParam.getFirstParamGroup("WebProcessGroup", webProcessGroup) == isNotOk)
     {
         idaTrackFatal(("Parameter file %s invalid. Reason : WebProcessGroup missing",
                    parFileName.cString()));
 		#ifdef MONITORING
-			cout << "Cannot access group \"WebProcessGroup\"" << endl;
+			std::cout << "Cannot access group \"WebProcessGroup\"" << std::endl;
 		#endif
 		return isNotOk;
     }
@@ -282,7 +282,7 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
     {
 		idaTrackFatal(("TdfProcess::initialize : There must exist at least one \"TdfProcessGroup\""));
 		#ifdef MONITORING
-			cout << "Cannot access group \"TdfProcessGroup\"" << endl;
+			std::cout << "Cannot access group \"TdfProcessGroup\"" << std::endl;
 		#endif
 		return isNotOk;
     }
@@ -372,11 +372,11 @@ ReturnStatus TdfProcess::initialize(const String& parFileName)
 												 regressionTest,
 												 sesConfig);
 
-			// Aktivieren der des Dispatchers zur Message-Übermittlung
+			// Aktivieren der des Dispatchers zur Message-ï¿½bermittlung
             tdfAccess->enableApplicationMessageBox();
             idaTrackData(("enableApplicationMessageBox() ...  done"));
 
-			// Wir merken uns die Instanz in einer Liste, damit sie später
+			// Wir merken uns die Instanz in einer Liste, damit sie spï¿½ter
 			// wieder abgebaut werden kann
             tdfAccessList.push_back(tdfAccess);
             idaTrackTrace(("TDF client #%d created, OID:%d, DBID:%d",
@@ -407,7 +407,7 @@ TdfProcess::~TdfProcess()
         cursor++;
     }
 
-	// Den eigenen Prozeß auschecken
+	// Den eigenen Prozeï¿½ auschecken
 # ifdef CLASSLIB_03_00
      Long ownOid;
     if (Process::getResMan()->getOwnProcRefId(ownOid) == isNotOk)

@@ -53,7 +53,7 @@ TdfChannelMgr::~TdfChannelMgr()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Setzt die Anzahl an verfügbaren Channels und legt entsprechend Elemente 
+//	Setzt die Anzahl an verfï¿½gbaren Channels und legt entsprechend Elemente 
 //	in der Liste an
 //
 ReturnStatus TdfChannelMgr::setNoOfChannels(UShort nChannels)
@@ -63,19 +63,19 @@ ReturnStatus TdfChannelMgr::setNoOfChannels(UShort nChannels)
 #endif	
 	
 	// Wenn schon Channels angelegt wurden und sich die Anzahl
-	// nicht geändert hat, dann machen wir nichts.
+	// nicht geï¿½ndert hat, dann machen wir nichts.
 	if (nChannels == totalNoOfChannels) return isOk;
 
 	// Anzahl Channels speichern
 	noOfFreeChannels  = nChannels;
 	totalNoOfChannels = nChannels;
 
-	// Alle evtl. vorhandenen Elemente der Liste löschen
+	// Alle evtl. vorhandenen Elemente der Liste lï¿½schen
 	erase(begin(), end());
 	
-	// Channels in gewünschter Anzahl neu anlegen
-	// die Zählung der Channels beginnt bei "1" !
-	// Ja, die nächste Zeile ist tricki ! (leider nicht von mir lua)
+	// Channels in gewï¿½nschter Anzahl neu anlegen
+	// die Zï¿½hlung der Channels beginnt bei "1" !
+	// Ja, die nï¿½chste Zeile ist tricki ! (leider nicht von mir lua)
 	//	 Implizite Konvertierung von i in ein TdfChannel-Objekt
 	for (UShort i = 1; i <= nChannels; i++) push_back(i);	
 
@@ -92,14 +92,14 @@ UShort TdfChannelMgr::reserveChannel()
     TRACE_FUNCTION("TdfChannelMgr::reserveChannel(...)");
 #endif	
 	
-	// Iteration über alle Channels
+	// Iteration ï¿½ber alle Channels
 	for (int i = 0; i < totalNoOfChannels; i++)
 	{
 		++lastReservedChannel;
 		lastReservedChannel %= totalNoOfChannels;
 		// channel holen
 		TdfChannel& channel = (*this)[lastReservedChannel];
-		// Wenn er verfügbar ist ...
+		// Wenn er verfï¿½gbar ist ...
 		if (channel.getStatus() == TdfChannel::available)
 		{
 			channel.reserve();
@@ -146,7 +146,7 @@ ReturnStatus TdfChannelMgr::releaseChannel(UShort channelNo)
 //
 //
 //
-void TdfChannelMgr::dump(ostream & out)
+void TdfChannelMgr::dump(std::ostream & out)
 {
 	iterator cursor = begin();
 
@@ -189,7 +189,7 @@ Void TdfChannelMgr::showStatus()
 		channels[curChannel.getNumber()-1] = ch;
 		cursor++;
 	}
-	cout << "\t\t\t\t[" << channels << "]" << counter << endl;
+	std::cout << "\t\t\t\t[" << channels << "]" << counter << std::endl;
 }
 
 

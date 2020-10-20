@@ -67,7 +67,7 @@ TdfChannel::~TdfChannel()
 //
 ReturnStatus TdfChannel::reserve()
 {
-	// Testen, ob wir den Channel belegen können
+	// Testen, ob wir den Channel belegen kï¿½nnen
     if (status == available)
 	{
 		status = reserved;
@@ -126,13 +126,13 @@ ReturnStatus TdfChannel::enable()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-void TdfChannel::dump(ostream & out) const
+void TdfChannel::dump(std::ostream & out) const
 {
-    out << "------ Channel ---------"                   << endl;
-    out << "number        : "         << number         << endl;
-    out << "lastAccessTime: "         << lastAccessTime << endl;
-    out << "status        : "         << status         << endl;
-    out << "------------------------"                   << endl;
+    out << "------ Channel ---------"                   << std::endl;
+    out << "number        : "         << number         << std::endl;
+    out << "lastAccessTime: "         << lastAccessTime << std::endl;
+    out << "status        : "         << status         << std::endl;
+    out << "------------------------"                   << std::endl;
 }
 
 

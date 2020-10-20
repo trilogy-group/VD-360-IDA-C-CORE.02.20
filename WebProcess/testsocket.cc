@@ -51,8 +51,8 @@ int main(int argc, char **argv, char **envp)
     // Analyze arguments
     if (argc != 3)
     {
-        cout << "Usage: testsocket querystring portnr" << endl;
-        cout << "e.g.:  testsocket \"NAM=pc-plus&QRY=all&HRA=mymachine\" 8888" << endl;
+        std::cout << "Usage: testsocket querystring portnr" << std::endl;
+        std::cout << "e.g.:  testsocket \"NAM=pc-plus&QRY=all&HRA=mymachine\" 8888" << std::endl;
         exit (1);
     }
 
@@ -63,7 +63,7 @@ int main(int argc, char **argv, char **envp)
     String hostname = getHostName();
     if (hostname == "")
     {
-        cout << "ERROR: getHostName failed" << endl;
+        std::cout << "ERROR: getHostName failed" << std::endl;
         exit(1);                
     }
 
@@ -71,21 +71,21 @@ int main(int argc, char **argv, char **envp)
     if (client.connect( hostname, portnr ) == isOk)
     {
         clientData = client;
-//        cout << "Client connecting to hostname " << hostname << " and port # " << portnr << endl;
+//        std::cout << "Client connecting to hostname " << hostname << " and port # " << portnr << std::endl;
     }
     else
     {
-        cout << "ERROR: Could not connect to port # " << portnr << endl;
+        std::cout << "ERROR: Could not connect to port # " << portnr << std::endl;
         exit (1);
     }
 
     if (clientData.writeStream(queryString, strlen(queryString), len) == isOk)
     {
-//        cout << "Client sent: " << queryString << endl;          
+//        std::cout << "Client sent: " << queryString << std::endl;          
     }
     else
     {
-        cout << "ERROR: Could not send data" << endl;
+        std::cout << "ERROR: Could not send data" << std::endl;
         exit (1);
     }
 
@@ -94,18 +94,18 @@ int main(int argc, char **argv, char **envp)
     while (clientData.readStream(bufferPtr, 100000, len) == isOk)
     {
         bufferPtr+=len;
-//        cout << "Len: " << len << endl;          
-//        cout << "Client received: " << buffer << endl;           
+//        std::cout << "Len: " << len << std::endl;          
+//        std::cout << "Client received: " << buffer << std::endl;           
     }
 /*
     else
     {
-        cout << "ERROR: Could not receive response" << endl;
+        std::cout << "ERROR: Could not receive response" << std::endl;
         exit (1);
     }
 */
 
-    cout << buffer;
+    std::cout << buffer;
 
     exit(0);
 }

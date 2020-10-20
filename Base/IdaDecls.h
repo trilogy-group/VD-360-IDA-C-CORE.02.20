@@ -26,7 +26,7 @@ static const char * SCCS_Id_IdaDecls_h = "@(#) IdaDecls.h 1.1";
 
 
 // An dieser Stelle kann Ausgabe nach stdout via "cout" komplett
-// also für WebProcess und TdfProcess abgeschaltet werden
+// also fï¿½r WebProcess und TdfProcess abgeschaltet werden
 // #define ALLOW_STDOUT
 
 
@@ -46,7 +46,7 @@ static const char * SCCS_Id_IdaDecls_h = "@(#) IdaDecls.h 1.1";
 
 
 // Bezeichner genau wie in "ida.par" inkl. Reihenfolge  !
-static istrstream idaDecls
+static std::istrstream idaDecls
 (
 	"TdfProcessGroup "			// TdsProcess
 		"DECLARE "
@@ -112,7 +112,7 @@ static const char* szSesConfigModeNORMAL	= "NORMAL";
 
 //------------------------------------------------------------------------------
 // Dieser Bereich ist hier definiert, weil man es in der CLASSLIB bisher
-// nicht für nötig erachtet hat IDA zu berücksichtigen !
+// nicht fï¿½r nï¿½tig erachtet hat IDA zu berï¿½cksichtigen !
 // Die folgenden Zeilen sollten also irgendwann in 
 //const ReportClass      iDAMinRepClass = 8301;
 //const ReportClass      iDAMaxRepClass = 8400;

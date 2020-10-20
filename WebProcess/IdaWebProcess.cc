@@ -63,7 +63,7 @@ static String requestStartTag5("<ModifyRequest>");
 
 
 
-// Wenn die Ausgaben nach "cout" unterbleiben sollen, dann diese Zeile auskommentieren !
+// Wenn die Ausgaben nach "std::cout" unterbleiben sollen, dann diese Zeile auskommentieren !
 #ifdef ALLOW_STDOUT
 	#define MONITORING
 #endif
@@ -201,10 +201,10 @@ ReturnStatus WebProcess:: init ()
 	idaTrackTrace(("Constructor WebProcess -OUT-"));
 
 	#ifdef MONITORING
-		cout << "myObjectId        = " << ownObjectId << endl;
-		cout << "socketPortNr      = " << socketPortNr << endl;
-		cout << "build 0003" << endl;
-		cout << "------------------------------------------------------" << endl;
+		std::cout << "myObjectId        = " << ownObjectId << std::endl;
+		std::cout << "socketPortNr      = " << socketPortNr << std::endl;
+		std::cout << "build 0003" << std::endl;
+		std::cout << "------------------------------------------------------" << std::endl;
 	#endif
 
 		
@@ -285,7 +285,7 @@ ReturnStatus WebProcess::eventBox(PollEvent event)
 	{
 		idaTrackExcept(("Event error"));
 		#ifdef MONITORING
-			cout << "\n*** EventError #" << myError << " occured" << endl;
+			std::cout << "\n*** EventError #" << myError << " occured" << std::endl;
 		#endif
 		return isNotOk;
 	}
@@ -320,7 +320,7 @@ ReturnStatus WebProcess::eventBox(PollEvent event)
 	{
 		idaTrackExcept(("***** unknown event received"));
 		#ifdef MONITORING
-			cout << "\nunknown event received" << endl;
+			std::cout << "\nunknown event received" << std::endl;
 		#endif
 	}
 
@@ -344,7 +344,7 @@ Void WebProcess::handleServerSocketEvent()
 	{
 		idaTrackExcept(("Additional connection refused"));
 		#ifdef MONITORING
-			cout << "*** Zusätzliche Verbindung abgelehnt !" << endl;
+			std::cout << "*** Zusätzliche Verbindung abgelehnt !" << std::endl;
 		#endif
 		refuseAdditionalConnection();
 		return;
@@ -358,7 +358,7 @@ Void WebProcess::handleServerSocketEvent()
 	{
 		// es hat geklappt, wir können uns den StreamSocket holen
 		#ifdef MONITORING
-			cout << "[S>>|" << flush;
+			std::cout << "[S>>|" << flush;
 		#endif
 		
 		// Wir spalten einen StreamSocket ab ...
@@ -375,7 +375,7 @@ Void WebProcess::handleServerSocketEvent()
 		{
 			idaTrackFatal(("checkInFd(streamSocket...) failed!"));
 			#ifdef MONITORING
-				cout << "*** checkInFd(streamSocket...) failed" << endl;
+				std::cout << "*** checkInFd(streamSocket...) failed" << std::endl;
 			#endif
 			connectionFlag = false;
 		}
@@ -397,7 +397,7 @@ Void WebProcess::handleServerSocketEvent()
 		// Leider können wir kein Fehlerdokument zurück senden
 		idaTrackExcept(("***** socket.connect() failed!"));
 		#ifdef MONITORING
-			cout << "*** socket.connect() failed" << endl;
+			std::cout << "*** socket.connect() failed" << std::endl;
 		#endif
 		connectionFlag = false;
 	}
@@ -430,7 +430,7 @@ Void WebProcess::handleStreamSocketEvent()
 		{
 			idaTrackExcept(("***** 0 bytes received, = transmition end"));
 			#ifdef MONITORING
-				cout << "receivedLength == 0" << endl;
+				std::cout << "receivedLength == 0" << std::endl;
 			#endif
 # ifdef CLASSLIB_03_00
 			eventDispatcher->checkOut(streamSocket.getSockFd());
@@ -442,7 +442,7 @@ Void WebProcess::handleStreamSocketEvent()
 			stopTimer(timerId);
 			connectionFlag = false;
 			#ifdef MONITORING
-				cout << "connection closed by Client" << endl;
+				std::cout << "connection closed by Client" << std::endl;
 			#endif
 			idaTrackExcept(("***** streamSocket closed, checked out, timer stopped, connectionFlag = false"));
 		}
@@ -505,7 +505,7 @@ Void WebProcess::handleStreamSocketEvent()
 		idaTrackTrace(("socket.readStream() receivedBytes = %d", receivedBytes)); 
 		PROBLEM(ownObjectId, iDAMinRepClass, 103, "");
 		#ifdef MONITORING
-			cout << "ConnectionError(" << streamSocket.getError() << ")|" << flush;
+			std::cout << "ConnectionError(" << streamSocket.getError() << ")|" << flush;
 		#endif
 # ifdef CLASSLIB_03_00
 		eventDispatcher->checkOut(streamSocket.getSockFd());
@@ -533,7 +533,7 @@ Void WebProcess::refuseAdditionalConnection()
 	idaTrackExcept(("I'm busy, refuse additional connection !"));
 	PROBLEM(ownObjectId, iDAMinRepClass, 119, "");
 	#ifdef MONITORING
-		cout << "refuse additional connection" << endl;
+		std::cout << "refuse additional connection" << std::endl;
 	#endif
 
 	
@@ -644,7 +644,7 @@ ReturnStatus WebProcess::sendRequestToTdfClient(const String& queryStr)
 	}
 
 	#ifdef MONITORING
-		cout << "R(" << requestId << ")>>T|" << flush;
+		std::cout << "R(" << requestId << ")>>T|" << flush;
 	#endif
 
 	{
@@ -670,11 +670,11 @@ ReturnStatus WebProcess::sendRequestToTdfClient(const String& queryStr)
 			if (dauer > requestDauerMax) requestDauerMax = dauer;
 			if (reqCounter >= 100)
 			{
-				cout << "\tRequest  min/avg/max [ms] : " 
+				std::cout << "\tRequest  min/avg/max [ms] : " 
 					 << requestDauerMin << "/"
 					 << requestDauer / reqCounter << "/"
 					 << requestDauerMax
-					 << endl;
+					 << std::endl;
 				requestDauerMin = 1000000;
 				requestDauerMax = 0;
 				requestDauer = 0;
@@ -759,7 +759,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
         }
 
         #ifdef MONITORING
-                cout << "R(" << requestId << ")>>T|" << flush;
+                std::cout << "R(" << requestId << ")>>T|" << flush;
         #endif
 
         {
@@ -785,11 +785,11 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
                         if (dauer > requestDauerMax) requestDauerMax = dauer;
                         if (reqCounter >= 100)
                         {
-                                cout << "\tRequest  min/avg/max [ms] : "
+                                std::cout << "\tRequest  min/avg/max [ms] : "
                                          << requestDauerMin << "/"
                                          << requestDauer / reqCounter << "/"
                                          << requestDauerMax
-                                         << endl;
+                                         << std::endl;
                                 requestDauerMin = 1000000;
                                 requestDauerMax = 0;
                                 requestDauer = 0;
@@ -890,7 +890,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
 						timeStamp2 = Time();
 					#endif
 					#ifdef MONITORING
-						cout << "T>>R(" << msg.getMsgRef() << ")." << flush;
+						std::cout << "T>>R(" << msg.getMsgRef() << ")." << flush;
 					#endif
 					msgString = "";
 					msgString.cat(headerAndString);
@@ -931,7 +931,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
 					++blockNumberCounter;
 
 					#ifdef MONITORING
-						cout << "." << flush;
+						std::cout << "." << flush;
 					#endif
 					// Wir stoppen den Timer erst, wenn der letzte Teil des
 					// XML-Dokumentes angekommen ist
@@ -968,7 +968,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
 					}
 					++blockNumberCounter;
 					#ifdef MONITORING
-						cout << "." << flush;
+						std::cout << "." << flush;
 					#endif
 					msgString.cat(headerAndString);
 				}
@@ -1004,7 +1004,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
 			idaTrackExcept(("Signal message (SIGPIPE) received!"));
 
 			#ifdef MONITORING
-				cout << "signalMsg received" << endl;
+				std::cout << "signalMsg received" << std::endl;
 			#endif
 			break;
 
@@ -1012,7 +1012,7 @@ ReturnStatus WebProcess::sendRequestToBackupTdfClient(const String& queryStr)
 		default:
 			// Ignore unexpected message type
 			#ifdef MONITORING
-				cout << "other Msg received" << endl;
+				std::cout << "other Msg received" << std::endl;
 			#endif
 			
 			break;
@@ -1061,7 +1061,7 @@ Void WebProcess::timerBox(const RefId id)
 		msgString = "";
 
 		#ifdef MONITORING
-			cout << "Timeout";
+			std::cout << "Timeout";
 		#endif
 		
 		// Fehler Dokument erzeugen
@@ -1088,7 +1088,7 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 	if (connectionFlag == false) 
 	{
 		#ifdef MONITORING
-			cout << "]" << endl;
+			std::cout << "]" << std::endl;
 		#endif
 		return isNotOk;
 	}
@@ -1098,10 +1098,10 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 	// -------------------------------------------------------------------------
 	// Senden der Daten via Socket
 	ssize_t bytesSend  = 0;
-	size_t  sendLength = sendString.cStringLen();
+	size_t  sendlength = sendString.cStringLen();
 	char*   str        = (char*)sendString.cString();
 	#ifdef MONITORING
-		cout << "{" << sendLength << "}" << flush;
+		std::cout << "{" << sendlength << "}" << flush;
 	#endif
 	
 	streamSocket.setBlocking(true);
@@ -1111,15 +1111,15 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 
 	
 	idaTrackData(("***** writing data within loop in blocking mode"));
-	while (sendLength > 0)
+	while (sendlength > 0)
 	{
 		idaTrackData(("***** loop start"));
-		if (streamSocket.writeStreamFixLen(str, sendLength, bytesSend) == isNotOk)
+		if (streamSocket.writeStreamFixLen(str, sendlength, bytesSend) == isNotOk)
 		{
 			idaTrackExcept(("***** writeStreamFixLen failed ! (may be ok)"));
 			StreamSocketBase::Errors err = streamSocket.getError();
 			#ifdef MONITORING
-				cout << "E(" << err << ")" << flush;
+				std::cout << "E(" << err << ")" << flush;
 			#endif
 			if ( ( err == StreamSocketBase::tryAgain ) || ( err == StreamSocketBase::interruptOccured ) )
 			{
@@ -1145,13 +1145,13 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 			break;
 		}
 
-		idaTrackData(("sendLength=%d, bytesSend=%d", sendLength, bytesSend));
+		idaTrackData(("sendlength=%d, bytesSend=%d", sendlength, bytesSend));
 		idaTrackData(("error=%d", (int)(streamSocket.getError())));
 
-		sendLength -= bytesSend;
+		sendlength -= bytesSend;
 		str        += bytesSend;
 		#ifdef MONITORING
-			cout << "{" << sendLength << "}" << flush;
+			std::cout << "{" << sendlength << "}" << flush;
 		#endif
 	}
 
@@ -1214,7 +1214,7 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 		// Fehler beim Schließen des Sockets
 		idaTrackExcept(("WebProcess::sendViaSocketAndClose failed (closeSocket)"));
 		#ifdef MONITORING
-			cout << "Server could not close Socket" << endl;
+			std::cout << "Server could not close Socket" << std::endl;
 		#endif
 		return isNotOk;
 	}
@@ -1223,24 +1223,24 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 
 
 	#ifdef MONITORING
-		cout << "|>>S] (";
+		std::cout << "|>>S] (";
 	#endif
 	#ifdef MONITORING
 		{
 			++gesamtCounter;
 			RelTime delta = Time() - timeStamp1;
 			ULong dauer = delta.inMilliSeconds();
-			cout << dauer << "ms)" << endl;
+			std::cout << dauer << "ms)" << std::endl;
 			gesamtDauer += dauer;
 			if (dauer < gesamtDauerMin) gesamtDauerMin = dauer;
 			if (dauer > gesamtDauerMax) gesamtDauerMax = dauer;
 			if (gesamtCounter >= 100)
 			{
-				cout << "\tGesamt   min/avg/max [ms] : " 
+				std::cout << "\tGesamt   min/avg/max [ms] : " 
 					 << gesamtDauerMin << "/"
 					 << gesamtDauer / gesamtCounter << "/"
 					 << gesamtDauerMax
-					 << endl;
+					 << std::endl;
 				gesamtDauerMin = 1000000;
 				gesamtDauerMax = 0;
 				gesamtDauer = 0;
@@ -1258,11 +1258,11 @@ ReturnStatus WebProcess::sendViaSocketAndClose(const String& sendString)
 			if (dauer > responseDauerMax) responseDauerMax = dauer;
 			if (responseCounter >= 100)
 			{
-				cout << "\tResponse min/avg/max [ms] : " 
+				std::cout << "\tResponse min/avg/max [ms] : " 
 					 << responseDauerMin << "/"
 					 << responseDauer / responseCounter << "/"
 					 << responseDauerMax
-					 << endl;
+					 << std::endl;
 				responseDauerMin = 1000000;
 				responseDauerMax = 0;
 				responseDauer = 0;
@@ -1311,7 +1311,7 @@ ReturnStatus WebProcess::createXmlNode(String& xmlString, const String& tag, con
 			default:
 				xmlString.cat(*value);
 		}
-		// Zur Sicherheit, dass keine Endlosschleife enstehen kann
+		// Zur Sicherheit, dass keine std::endlosschleife enstehen kann
 		if (!--saveCounter)	break;
 	}
 

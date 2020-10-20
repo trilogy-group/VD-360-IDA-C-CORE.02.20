@@ -294,17 +294,6 @@ sub readBuildInfo
           }
             
       }
-
-    my $extlibs = $buildInfo->{SoftwareDependencies}->{SourceEnvironment}->{ExternalLibraries}->{ExternalLibrary};
-    my @extLibraries = @{$extlibs};
-
-    foreach $extlib (@extLibraries)
-      {
-        if ( ( $extlib->{'bi:name'} =~ /xerces/ ) && ($UNAME ne "Windows"))
-          {
-            $ENV{'XERCESHOME'}="$pool/".$extlib->{'bi:name'}."/" . $extlib->{'bi:version'};
-          }
-      }
   }
 
 sub getArguments

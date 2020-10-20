@@ -42,12 +42,12 @@ int main ( )
     YpHtmlScanner htmlScanner;
     int i;
 
-    cout << endl;
-    cout << "---------  Testprogramm TestScan  ----------" << endl;
-    cout << endl;
-    cout << "Bitte Template-Dateiname eingeben > "; 
+    std::cout << std::endl;
+    std::cout << "---------  Testprogramm TestScan  ----------" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Bitte Template-Dateiname eingeben > "; 
     cin >> tplFileName;
-    cout << tplFileName << endl << endl;
+    std::cout << tplFileName << std::endl << std::endl;
 
     try
     {
@@ -56,9 +56,9 @@ int main ( )
     }
     catch (const YpHttpException& exptn)
     {
-        cout << endl << endl;
-        cout << "+++ Datei " << tplFileName << " nicht gefunden.";
-        cout << endl << endl;
+        std::cout << std::endl << std::endl;
+        std::cout << "+++ Datei " << tplFileName << " nicht gefunden.";
+        std::cout << std::endl << std::endl;
         return(0);
     }
 
@@ -91,14 +91,14 @@ int main ( )
                 strncpy (tokenValue, valPtr, valLen);
                 tokenValue[valLen] = '\0';
         }
-        cout << YpHtmlScanner::getTokenName (curToken);
-        cout << " | " << tokenValue;
+        std::cout << YpHtmlScanner::getTokenName (curToken);
+        std::cout << " | " << tokenValue;
         if (curToken == YpHtmlScanner::YP_MACRO)
         {
             macroType = htmlScanner.getMacroType ();
-            cout << " | " << YpHtmlScanner::getMacroName (macroType);
+            std::cout << " | " << YpHtmlScanner::getMacroName (macroType);
         }
-        cout << endl;
+        std::cout << std::endl;
     }
     while (curToken != YpHtmlScanner::END_OF_INPUT);
     outBuffer[outBufPtr] = '\0';

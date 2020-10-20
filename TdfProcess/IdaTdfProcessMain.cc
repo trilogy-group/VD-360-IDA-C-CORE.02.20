@@ -39,15 +39,15 @@ static const char * SCCS_Id_IdaTdfProcessMain_cc = "@(#) IdaTdfProcessMain.cc 1.
 
 int main(int argc, char** argv, char** envp)
 {
-	cerr << "TdfProcess started ..." << endl;
+	std::cerr << "TdfProcess started ..." << std::endl;
 	
 	// Check parameter
    String par1( argv[1] );
 	if ( (argc < 1 ) || ( (argc < 3) && (par1 == "115") ) )
 	{
-		cerr << "error: missing arguments" << endl;
-		cerr << "Usage: " << argv[0] << " <ParFile> "
-			 << "[ -tr <TraceLevel> -tf <TraceFile> ]" << endl;
+		std::cerr << "error: missing arguments" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " <ParFile> "
+			 << "[ -tr <TraceLevel> -tf <TraceFile> ]" << std::endl;
 		exit(1);
 	}
 
@@ -71,7 +71,7 @@ int main(int argc, char** argv, char** envp)
 	// Wenn die Initialisierung ok ist ...
 	if (tdfProcess.initialize(parFileName) == isOk)
 	{
-		// ... dann können wir die Instanz starten
+		// ... dann kï¿½nnen wir die Instanz starten
 		tdfProcess.run();
 	}
 
