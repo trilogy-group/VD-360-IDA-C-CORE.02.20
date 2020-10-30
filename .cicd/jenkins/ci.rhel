@@ -1,0 +1,20 @@
+#!groovy
+import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
+import groovy.io.FileType
+
+def credentials = 'voltdeltajenkins'
+def nexusRelease = 'VDI-360-Releases'
+def nexusSnapshots = 'VDI-360-Snapshots'
+def project = ''
+
+node ('voltdelta-360-eti-ci-rhel6')
+{
+    CI_ScriptedPipeline (
+        module: "ida.yml",
+        artifactName: 'ida-2.20',
+        credentials: credentials,
+        nexusReleasesRepositoryId: nexusSnapshots,
+        nexusSnapshotsRepositoryId: nexusSnapshots,
+        projectName: project
+    )
+}

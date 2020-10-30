@@ -1,0 +1,3 @@
+[submodule "dependencies/osaapi"]
+	path = dependencies/osaapi
+	url = ../VD-360-OSAAPI-OSAAPI.02.20.git

@@ -70,7 +70,7 @@ class TdfChannelMgr : protected VectorOfChannels
 //		}
 	
 		/** Dump channel info */
-		void dump(ostream& out);
+		void dump(std::ostream& out);
 
 		Void showStatus();
 	

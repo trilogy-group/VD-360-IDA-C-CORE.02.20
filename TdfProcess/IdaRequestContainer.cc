@@ -32,7 +32,7 @@ static const char * SCCS_Id_IdaRequestContainer_cc = "@(#) IdaRequestContainer.c
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Konstruktor mit Parameterübergabe
+//	Konstruktor mit Parameterï¿½bergabe
 //
 RequestContainer::RequestContainer()
 	: status(notReady),
@@ -62,7 +62,7 @@ RequestContainer::RequestContainer(UShort	reqId,
 {
 //	birth.actualizeGmtTime();		
 	#ifdef MONITORING
-//		cout << birth.formatTime() << endl;
+//		cout << birth.formatTime() << std::endl;
 	#endif
 	idaTrackData(("RequestContainer::RequestContainer() Constructor called"));
 }
@@ -80,7 +80,7 @@ RequestContainer::~RequestContainer()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Prüft das Alter des Requestes und gibt "true" zurück, wenn er veraltet ist,
+//	Prï¿½ft das Alter des Requestes und gibt "true" zurï¿½ck, wenn er veraltet ist,
 //	sonst "false"
 //
 Bool RequestContainer::expired() const
@@ -100,7 +100,7 @@ Bool RequestContainer::expired() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Diese Methode prüft einige Parameter und verändert gegebenenfalls den Status
+//	Diese Methode prï¿½ft einige Parameter und verï¿½ndert gegebenenfalls den Status
 //
 Void RequestContainer::checkStatus()
 {

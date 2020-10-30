@@ -45,15 +45,15 @@ static const char * SCCS_Id_IdaWebProcess_cc = "@(#) IdaWebProcessMain.cc 1.1";
 
 int main(int argc, char** argv, char** envp)
 {
-	cerr << "WebProcess started ..." << endl;
+	std::cerr << "WebProcess started ..." << std::endl;
     
     String parameter1 ( argv[1] );
 	// Check parameter
 	if ( (argc < 2 ) || ( (argc < 4) && (parameter1 == "115") ) )
 	{
-		cerr << "error: missing arguments" << endl;
-		cerr << "Usage: " << argv[0] << " <CommSlot> <ParFile> "
-			 << "[ -tr <TraceLevel> -tf <TraceFile> ]" << endl;
+		std::cerr << "error: missing arguments" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " <CommSlot> <ParFile> "
+			 << "[ -tr <TraceLevel> -tf <TraceFile> ]" << std::endl;
 		exit(1);
 	}
 
@@ -62,22 +62,22 @@ int main(int argc, char** argv, char** envp)
 
 	// -------------------------------------------------------------------------
 	// Als erstes versuchen wir den Trace-Mechanismus zu aktivieren,
-	// damit wir sofort Fehler ausgeben können:
+	// damit wir sofort Fehler ausgeben kï¿½nnen:
     
 	String			traceFileName;
     int				traceLevel = 0;
     char			pidStr[256];
 
-	// Parameter holen, wenn verfügbar
+	// Parameter holen, wenn verfï¿½gbar
     TraceMgr::getTraceSettings(argc, argv, traceFileName, traceLevel);
     sprintf(pidStr, "%d", getpid());
 	
-	// Wenn kein Filename angegeben wurde, nehmen wir den Prozeßnamen
+	// Wenn kein Filename angegeben wurde, nehmen wir den Prozeï¿½namen
     if (traceFileName.isEmpty())
 	 {
 		traceFileName.assign(argv[0]);
 		
-   	// ... und hängen die PID hinten an
+   	// ... und hï¿½ngen die PID hinten an
 		traceFileName = traceFileName + pidStr;
 	 }
 	 
@@ -89,7 +89,7 @@ int main(int argc, char** argv, char** envp)
 
     if (traceLevel)
     {
-      cout<<"Startup WebProcess"<<endl;
+      std::cout<<"Startup WebProcess"<<std::endl;
     }
 	idaTrackData(("TraceLevel = %d", traceLevel));
 # else
@@ -102,7 +102,7 @@ int main(int argc, char** argv, char** envp)
 # endif
 
 	#ifdef MONITORING
-		cout << "traceLevel = " << traceLevel << endl;
+		std::cout << "traceLevel = " << traceLevel << std::endl;
 	#endif
 
 
@@ -139,37 +139,37 @@ int main(int argc, char** argv, char** envp)
 
 		// Ohne Parameter geht nichts !
         idaTrackFatal(("Declaration section IdaDecls invalid. Reason: %s", sysParam.getErrorText().cString()));
-		  cerr<<"Declaration section IdaDecls invalid. Reason:" << sysParam.getErrorText().cString() << endl;
+		  std::cerr<<"Declaration section IdaDecls invalid. Reason:" << sysParam.getErrorText().cString() << std::endl;
 		exit(1);
     }
 
     // Parameterfile lesen
-    ifstream parFile(parFileName.cString());
+    std::ifstream parFile(parFileName.cString());
     if (!parFile)
     {
-		// Parameterfile konnte nicht geöffnet werden
+		// Parameterfile konnte nicht geï¿½ffnet werden
 		idaTrackFatal(("Parameter file %s not found", parFileName.cString()));
-        cerr<<"Parameter file %s not found"<<parFileName<<endl;
+        std::cerr<<"Parameter file %s not found"<<parFileName<<std::endl;
 		exit(1);
     }
     if (sysParam.readAllParams(parFile) == isNotOk)
     {
 		// Parameterfile vorhanden, aber syntaktisch nicht korrekt
 		idaTrackFatal(("Parameter file %s invalid. Reason: %s", parFileName.cString(), sysParam.getErrorText().cString()));
-        cerr<<"Parameter file"<<parFileName<<"invalid. Reason: "<<sysParam.getErrorText().cString()<<endl;
+        std::cerr<<"Parameter file"<<parFileName<<"invalid. Reason: "<<sysParam.getErrorText().cString()<<std::endl;
 		exit(1);
     }
     parFile.close();
 
 
 	// -------------------------------------------------------------------------
-	// Basis OID für den WebProcess holen. Auf diesen wird später für jede
-	// Prozeß-Instanz ein entsprechender Offset (aus shared memory) hinzu addiert.
+	// Basis OID fï¿½r den WebProcess holen. Auf diesen wird spï¿½ter fï¿½r jede
+	// Prozeï¿½-Instanz ein entsprechender Offset (aus shared memory) hinzu addiert.
     SysParamGroup webProcessGroup("WebProcessGroup", true);
     if (sysParam.getFirstParamGroup("WebProcessGroup", webProcessGroup) == isNotOk)
     {
         idaTrackFatal(("Parameter file %s invalid. Reason : WebProcessGroup missing",parFileName.cString()));
-          cerr<<"Parameter file is invalid!! Reason : WebProcessGroup missing"<<endl;
+          std::cerr<<"Parameter file is invalid!! Reason : WebProcessGroup missing"<<std::endl;
 		exit(1);
     }
 
@@ -178,22 +178,22 @@ int main(int argc, char** argv, char** envp)
     if (webProcessGroup.getParameter("base_objectid", baseOid) == isNotOk)
     {
         idaTrackFatal(("Parameter file %s invalid. Reason : \"base_objectid\" missing", parFileName.cString()));
-          cerr<<"parameter file invalid. Reason : \"base_objectid\" missing"<<endl;
+          std::cerr<<"parameter file invalid. Reason : \"base_objectid\" missing"<<std::endl;
 		exit(1);
     }
     idaTrackData(("Base Object-ID for WebProcess: %d", baseOid));
-    cout<<"Base Object-ID for WebProcess: "<<baseOid<<endl;
+    std::cout<<"Base Object-ID for WebProcess: "<<baseOid<<std::endl;
 
-	// BasePort für die Socket Kommunikation
+	// BasePort fï¿½r die Socket Kommunikation
     int socketPort;
     if (webProcessGroup.getParameter("base_socket_port", socketPort) == isNotOk)
     {
         idaTrackFatal(("Parameter file %s invalid. Reason : \"base_socket_port\" missing", parFileName.cString()));
-          cerr<<"Parameter file invalid. Reason : \"base_socket_port\" missing"<<endl;
+          std::cerr<<"Parameter file invalid. Reason : \"base_socket_port\" missing"<<std::endl;
         exit(1);
     }
       idaTrackData(("Base Socket-Port for WebProcess: %d", socketPort));
-      cout<<"Base Socket-Port for WebProcess:" <<socketPort<<endl;
+      std::cout<<"Base Socket-Port for WebProcess:" <<socketPort<<std::endl;
 
 
 	// Jetzt brauchen wir noch die OID des TdfClient
@@ -206,12 +206,12 @@ int main(int argc, char** argv, char** envp)
     {
 		// Einen TdfClient brauchen wir mindestens, also Fehler und Abbruch
         idaTrackFatal(("Parameter file %s invalid. Reason : TdfProcessGroup missing", parFileName.cString()));
-          cerr<<"Parameter file %s invalid. Reason : TdfProcessGroup missing"<<endl;
+          std::cerr<<"Parameter file %s invalid. Reason : TdfProcessGroup missing"<<std::endl;
 		exit(1);
     }
 
-	// Wir iterieren über alle Subgroups von TdfProcessGroup und "sammeln" die OID's
-	// der einzelnen TdfClients, damit diese später unter diesen OID's angesprochen werden können
+	// Wir iterieren ï¿½ber alle Subgroups von TdfProcessGroup und "sammeln" die OID's
+	// der einzelnen TdfClients, damit diese spï¿½ter unter diesen OID's angesprochen werden kï¿½nnen
 	DatabaseList databaseList;
 	while (returnStatus == isOk)
 	{
@@ -219,24 +219,24 @@ int main(int argc, char** argv, char** envp)
 		if (tdfProcessGroup.getParameter("objectid", objectid) == isNotOk)
 		{
 			idaTrackFatal(("Parameter file %s invalid. Reason : \"objectid\" missing", parFileName.cString()));
-            cerr<<"Parameter file invalid. Reason : \"objectid\" missing"<<endl;
+            std::cerr<<"Parameter file invalid. Reason : \"objectid\" missing"<<std::endl;
 			exit(1);
 		}
 		RefId dbid;
 		if (tdfProcessGroup.getParameter("dbid", dbid) == isNotOk)
 		{
 			idaTrackFatal(("Parameter file %s invalid. Reason : \"dbid\" missing", parFileName.cString()));
-            cerr<<"Parameter file invalid. Reason : \"dbid\" missing"<<endl;
+            std::cerr<<"Parameter file invalid. Reason : \"dbid\" missing"<<std::endl;
 			exit(1);
 		}
 		idaTrackData(("Found DB with OID: %d and DBID: %d", objectid, dbid));
-        cout<<"Found DB with OID: "<<objectid<<" and DBID: "<<dbid<<endl;
+        std::cout<<"Found DB with OID: "<<objectid<<" and DBID: "<<dbid<<std::endl;
 
         RefId backupobjectid;
                 if (tdfProcessGroup.getParameter("backup_objectid", backupobjectid) == isNotOk)
                 {
                         idaTrackExcept(("Parameter file %s invalid. Reason : \"backup_objectid\" missing ", parFileName.cString()));
-            cerr<<"Parameter file invalid. Reason : \"backup_objectid\" missing"<<endl;
+            std::cerr<<"Parameter file invalid. Reason : \"backup_objectid\" missing"<<std::endl;
                         //exit(1);
                         backupobjectid = -1;
                 }
@@ -245,7 +245,7 @@ int main(int argc, char** argv, char** envp)
 		// Werte in die Liste eintragen
 		databaseList.addDb(dbid, objectid, backupobjectid);
 
-		// Nächste Subgroup holen
+		// Nï¿½chste Subgroup holen
 		returnStatus = sysParam.getNextParamGroup("TdfProcessGroup", tdfProcessGroup);
 	}
 
@@ -256,7 +256,7 @@ int main(int argc, char** argv, char** envp)
     if (sysParam.getFirstParamGroup("TimerAndMaxValueGroup", timerAndMaxValueGroup) == isNotOk)
     {
         idaTrackExcept(("Parameter file %s invalid. Reason : TimerAndMaxValueGroup missing", parFileName.cString()));
-        cerr<<"Parameter file invalid. Reason : TimerAndMaxValueGroup missing"<<endl;
+        std::cerr<<"Parameter file invalid. Reason : TimerAndMaxValueGroup missing"<<std::endl;
     }
 
     if (timerAndMaxValueGroup.getParameter("search_timeout", searchTimeout) == isNotOk)
@@ -264,7 +264,7 @@ int main(int argc, char** argv, char** envp)
 		searchTimeout = 10000;
     }
     idaTrackData(("searchTimeout value: %d", searchTimeout));
-    cout<<"searchTimeout value: "<<searchTimeout<<endl;
+    std::cout<<"searchTimeout value: "<<searchTimeout<<std::endl;
 
 
     // Determine own object-ID for classlib object communication.
@@ -273,28 +273,28 @@ int main(int argc, char** argv, char** envp)
     if (commSlot < 0)
     {
 	idaTrackFatal(("No communication slot available"));
-        cerr<<"No communication slot available"<<endl;
+        std::cerr<<"No communication slot available"<<std::endl;
 		exit(1);
     }
     baseOid    += commSlot;
     socketPort += commSlot;
     idaTrackData(("Own object ID: %d", ownOID));
     idaTrackData(("Own socket: %d", socketPort));
-    cout<<"Own object ID: "<<ownOID<<endl;
-    cout<<"Own socket: "<<socketPort<<endl;
+    std::cout<<"Own object ID: "<<ownOID<<std::endl;
+    std::cout<<"Own socket: "<<socketPort<<std::endl;
     // Instantiate WebProcess 
 	WebProcess webProcess(argc, argv, envp,
 						  baseOid,				// eigene OID
 						  commSlot,				// SlotId = Offset zu der Basis-ObjektID
 						  databaseList,			// Liste der OID's der ansprechbaren Datenbanken
 						  socketPort,			// Socket Portnummer
-						  searchTimeout		// Timeout für Suchanfragen
+						  searchTimeout		// Timeout fï¿½r Suchanfragen
 						  );
 
    if ( webProcess. init () == isNotOk )
    {
      idaTrackFatal(("webProcess initialization failed"));
-     cerr<<"webProcess initialization failed"<<endl;
+     std::cerr<<"webProcess initialization failed"<<std::endl;
      exit(1);
    }
 
@@ -305,13 +305,13 @@ int main(int argc, char** argv, char** envp)
 	else
 	{
 	   idaTrackFatal(("webProcess initialization failed"));
-      cerr<<"webProcess initialization failed"<<endl;
+      std::cerr<<"webProcess initialization failed"<<std::endl;
 		exit(1);
 	}
     
 	// Cleanup
     idaTrackTrace(("End WebProcess"));
-    cout<<"End WebProcess"<<endl;
+    std::cout<<"End WebProcess"<<std::endl;
 
     return 0;
 }

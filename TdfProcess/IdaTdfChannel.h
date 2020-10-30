@@ -42,7 +42,7 @@ class TdfChannel
 		{
 			available,		// frei, benutzbar
 			reserved,		// gerade in Benutzung
-			disabled		// nicht verfügbar (evtl. temporär)
+			disabled		// nicht verfï¿½gbar (evtl. temporï¿½r)
 		};
 	
 		// ---------------------------------------------------------------------
@@ -84,7 +84,7 @@ class TdfChannel
 		// ---------------------------------------------------------------------
 		
 		/** Dump channel info */
-		void dump(ostream& out) const;
+		void dump(std::ostream& out) const;
 	
 		/** Equal operator */
 		friend int operator == ( const TdfChannel& ch1,

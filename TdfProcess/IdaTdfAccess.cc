@@ -59,14 +59,14 @@ static const char * SCCS_Id_TdfAccess_cc = "@(#) IdaTdfAccess.cc 1.2";
 #include <IdaCpd.h>
 #include <IdaRequestContainer.h>
 
-// Das folgende Makro ist notwendig um unter AIX die XERCES header mit einbinden zu können.
+// Das folgende Makro ist notwendig um unter AIX die XERCES header mit einbinden zu kï¿½nnen.
 // Diese benutzen leider auch einen boolean Typ der mit dem der STL kollidiert
 // In allen Dateien des OSA-Treibers darf nur der Typ "Bool" verwendet werden, damit es
 // kein Durcheinander gibt !
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/sax/ErrorHandler.hpp>
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
@@ -81,7 +81,6 @@ static const char * SCCS_Id_TdfAccess_cc = "@(#) IdaTdfAccess.cc 1.2";
 
 
 //just for test purposes
-#include <xercesc/dom/DOMWriter.hpp>
 #include <xercesc/util/BinInputStream.hpp>
 #include <xercesc/util/BinMemInputStream.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
@@ -90,7 +89,7 @@ static const char * SCCS_Id_TdfAccess_cc = "@(#) IdaTdfAccess.cc 1.2";
 
 #include <IdaTdfAccess.h>
 
-
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,23 +202,23 @@ TdfAccess::TdfAccess(const ObjectId&  				myId,
 
 
 	#ifdef MONITORING
-		cout << dbIdString << "applicationName = " << applicationName << endl;
-		cout << dbIdString << "myObjectId      = " << myObjectId.getIdentifier() << endl;
-		cout << dbIdString << "databaseId      = " << databaseId << endl;
-    	cout << dbIdString << "serverControl   = " << serverControl.getIdentifier() << endl;
-    	cout << dbIdString << "serverService   = " << serverService.getIdentifier() << endl;
-		cout << dbIdString << "ses mode        = ";
+		std::cout << dbIdString << "applicationName = " << applicationName << std::endl;
+		std::cout << dbIdString << "myObjectId      = " << myObjectId.getIdentifier() << std::endl;
+		std::cout << dbIdString << "databaseId      = " << databaseId << std::endl;
+    	std::cout << dbIdString << "serverControl   = " << serverControl.getIdentifier() << std::endl;
+    	std::cout << dbIdString << "serverService   = " << serverService.getIdentifier() << std::endl;
+		std::cout << dbIdString << "ses mode        = ";
 		switch (sesConfig.enumMode)
 		{
-			case SesConfig::NONE :      cout << szSesConfigModeNONE;    	break;
-			case SesConfig::DEFAULT :   cout << szSesConfigModeDEFAULT; 	break;
-			case SesConfig::NORMAL :    cout << szSesConfigModeNORMAL;  	break;
+			case SesConfig::NONE :      std::cout << szSesConfigModeNONE;    	break;
+			case SesConfig::DEFAULT :   std::cout << szSesConfigModeDEFAULT; 	break;
+			case SesConfig::NORMAL :    std::cout << szSesConfigModeNORMAL;  	break;
 		}
-		cout << endl;
+		std::cout << std::endl;
 		if (sesConfig.enumMode == SesConfig::DEFAULT)
 		{
-			cout << dbIdString << "default user    = " << sesConfig.stDefaultUser << endl;
-			cout << dbIdString << "default pwd     = " << sesConfig.stDefaultPwd << endl;
+			std::cout << dbIdString << "default user    = " << sesConfig.stDefaultUser << std::endl;
+			std::cout << dbIdString << "default pwd     = " << sesConfig.stDefaultPwd << std::endl;
 		}
 	#endif
 	
@@ -243,7 +242,7 @@ TdfAccess::TdfAccess(const ObjectId&  				myId,
 
 	
 	// SES Manager initialisieren
-	// Ermöglicht den Zugriff auf den SES-Prozess über eine 
+	// Ermï¿½glicht den Zugriff auf den SES-Prozess ï¿½ber eine 
 	// Singleton-Instanz
     //if (initSesMgr() == isNotOk)			returnStatus = isNotOk;
 
@@ -259,10 +258,10 @@ TdfAccess::TdfAccess(const ObjectId&  				myId,
 		changeStatus(initialized);
 	}
 
-	// Hier wird der Registrierungs-Mechanismus (inkl. Retry) angestoßen
+	// Hier wird der Registrierungs-Mechanismus (inkl. Retry) angestoï¿½en
 	startRegistration();
 
-	// Initialisierung einiger Variablen für die Performance-Messung
+	// Initialisierung einiger Variablen fï¿½r die Performance-Messung
 	requestCounter = 0;
 	requestDauer = 0;
 	requestDauerMin = 1000000;
@@ -323,11 +322,11 @@ Void TdfAccess::shutdown(ObjectId& myId)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Diese Methode kontrolliert zentral alle Änderungen des internen Zustandes.
-//	Der interne Zustand zeigt an, ob das System ordnungsgemäß initialisiert
+//	Diese Methode kontrolliert zentral alle ï¿½nderungen des internen Zustandes.
+//	Der interne Zustand zeigt an, ob das System ordnungsgemï¿½ï¿½ initialisiert
 //	und registriert wurde.
 //	Die Zustands-Variable "status" sollte also in keinem Fall direkt gesetzt
-//  werden. Illegale Zustandsübergänge werden hier erkannt und angezeigt.
+//  werden. Illegale Zustandsï¿½bergï¿½nge werden hier erkannt und angezeigt.
 //
 Void TdfAccess::changeStatus(TdfAccessStatus newStatus)
 {
@@ -335,13 +334,13 @@ Void TdfAccess::changeStatus(TdfAccessStatus newStatus)
 	TRACE_FUNCTION("TdfAccess::changeStatus(...)");
 #endif	
 	
-	// Nur echte Änderungen behandeln
+	// Nur echte ï¿½nderungen behandeln
 	if (status == newStatus) return;
 	
 	// Alten Zustand sichern
 	TdfAccessStatus oldStatus = status;
 	
-	// Flag, das anzeigt, ob eine Zustandsänderung stattgefunden hat
+	// Flag, das anzeigt, ob eine Zustandsï¿½nderung stattgefunden hat
 	int changed = 0;
 
 	switch (status)
@@ -462,7 +461,7 @@ ReturnStatus TdfAccess::prepareOsaTicket()
 	TRACE_FUNCTION("TdfAccess::prepareOsaTicket(...)");
 #endif	
 	
-	ifstream osaTicketFile(osaTicketFileName.cString());
+	std::ifstream osaTicketFile(osaTicketFileName.cString());
 	if (osaTicketFile)
 	{
 		idaTrackData(("prepareOsaTicket(): Reading osaTicket file."));
@@ -482,7 +481,7 @@ ReturnStatus TdfAccess::prepareOsaTicket()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Bevor der Xerces XML-Parser benutzt werden kann, muß die XML-Platform
+//	Bevor der Xerces XML-Parser benutzt werden kann, muï¿½ die XML-Platform
 //	initialisiert werden
 //
 ReturnStatus TdfAccess::initXMLPlatform()
@@ -499,7 +498,7 @@ ReturnStatus TdfAccess::initXMLPlatform()
 	{
 		idaTrackFatal(("XMLPlatformUtils::Initialize() failed !"));
 		#ifdef MONITORING
-			cout << dbIdString << "XMLPlatformUtils::Initialize() failed !" << endl;
+			std::cout << dbIdString << "XMLPlatformUtils::Initialize() failed !" << std::endl;
 		#endif
 		
 		return isNotOk;
@@ -523,15 +522,15 @@ ReturnStatus TdfAccess::startRegistration()
 	TRACE_FUNCTION("TdfAccess::startRegistration(...)");
 #endif	
 	
-	// Wenn die Registrierung bereits läuft, wird nicht gemacht
+	// Wenn die Registrierung bereits lï¿½uft, wird nicht gemacht
 	if (getStatus() == tryingToRegister) return isOk;
 
-	// Status ändern
+	// Status ï¿½ndern
 	changeStatus(initialized);
 	changeStatus(tryingToRegister);
 	
 		
-	// Wir setzen den Registrierungs-Zähler zurück
+	// Wir setzen den Registrierungs-Zï¿½hler zurï¿½ck
 	registrationRetryCounter = 0;
 
 	EVENT(myObjectId, iDAMinRepClass, 211, "");
@@ -543,9 +542,9 @@ ReturnStatus TdfAccess::startRegistration()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Hier wird ein Request-Objekt für die Registrierung aufgebaut und gesendet. Anschießend wird
-//	der Registrierungs-Timer gestartet. Die Überprüfung der maximalen Registrier-Wiederholungen
-//	wird ebenfalls an dieser Stelle überwacht und behandelt.
+//	Hier wird ein Request-Objekt fï¿½r die Registrierung aufgebaut und gesendet. Anschieï¿½end wird
+//	der Registrierungs-Timer gestartet. Die ï¿½berprï¿½fung der maximalen Registrier-Wiederholungen
+//	wird ebenfalls an dieser Stelle ï¿½berwacht und behandelt.
 //
 ReturnStatus TdfAccess::sendRegisterRequest()
 {
@@ -554,11 +553,11 @@ ReturnStatus TdfAccess::sendRegisterRequest()
 #endif
 
 	#ifdef MONITORING
-		cout << dbIdString << "sendRegisterRequest() " << endl;
+		std::cout << dbIdString << "sendRegisterRequest() " << std::endl;
 	#endif
 	
 	// -------------------------------------------------------------------------
-	// Der richtige Status muß vorliegen
+	// Der richtige Status muï¿½ vorliegen
 	if (getStatus() != tryingToRegister) return isNotOk;
 
 
@@ -568,8 +567,8 @@ ReturnStatus TdfAccess::sendRegisterRequest()
 		ALARM(myObjectId, iDAMinRepClass, 4, countryCode);
 
 		#ifdef MONITORING
-			cout << dbIdString << "registrationRetryCounter >= maxRegistrationAttempts" << endl;
-			cout << dbIdString << "registration attempt stopped ! *** SERVICE NOT AVALABLE ***" << endl;
+			std::cout << dbIdString << "registrationRetryCounter >= maxRegistrationAttempts" << std::endl;
+			std::cout << dbIdString << "registration attempt stopped ! *** SERVICE NOT AVALABLE ***" << std::endl;
 		#endif
 
 		changeStatus(unAvailable);
@@ -602,7 +601,7 @@ ReturnStatus TdfAccess::sendRegisterRequest()
 		idaTrackFatal(("Error: TdfRegisterArg not all mandatory Items are set!"));
 
 		#ifdef MONITORING
-			cout << dbIdString << "tdfRegisterArg.areMandatoryItemsSet() != true" << endl;
+			std::cout << dbIdString << "tdfRegisterArg.areMandatoryItemsSet() != true" << std::endl;
 		#endif
 
 		return isNotOk;
@@ -619,15 +618,15 @@ ReturnStatus TdfAccess::sendRegisterRequest()
 	{
 		OsaComError error = getLastError();
 		#ifdef MONITORING
-			cout << "registerRequest() failed: " << error.getErrorCode() << "|"
+			std::cout << "registerRequest() failed: " << error.getErrorCode() << "|"
 				 << error.getErrorSource() << "|" 
-				 << error.getErrorText() << endl;
+				 << error.getErrorText() << std::endl;
 		#endif
 		idaTrackExcept(("registerRequest() failed ! %s", error.getErrorText()));
 		PROBLEM(myObjectId, iDAMinRepClass, 120, "");
 
 		#ifdef MONITORING
-			cout << dbIdString << "registerRequest() failed !" << endl;
+			std::cout << dbIdString << "registerRequest() failed !" << std::endl;
 		#endif
 	}
 
@@ -638,7 +637,7 @@ ReturnStatus TdfAccess::sendRegisterRequest()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Vorbereitung und Durchführung der De-Registrierung von der Datenbank
+//	Vorbereitung und Durchfï¿½hrung der De-Registrierung von der Datenbank
 //
 ReturnStatus TdfAccess::sendDeRegisterRequest()
 {
@@ -703,11 +702,11 @@ Void TdfAccess::registerConfirmation(const TdfRegisterRes& tdfRegisterRes)
 		errorArg = tdfRegisterRes.getErrorArg();
 		idaTrackExcept(("registerConfirmation(): ErrorText = %s", errorArg.getErrorText()));
 		#ifdef MONITORING
-			cout << "registerConfirmation(): ErrorText = " << errorArg.getErrorText() << endl;
+			std::cout << "registerConfirmation(): ErrorText = " << errorArg.getErrorText() << std::endl;
 		#endif
 
 		// Wir versuchen eine erneute Registrierung
-		// (aber nicht sofort, sonst würde der Server mit Nachrichten überflutet werden)
+		// (aber nicht sofort, sonst wï¿½rde der Server mit Nachrichten ï¿½berflutet werden)
 		startRegisterTimer();
 		return;
 	}
@@ -725,10 +724,10 @@ Void TdfAccess::registerConfirmation(const TdfRegisterRes& tdfRegisterRes)
 
 	idaTrackData(("TDS applId:%d, #channels:%d", applicationId, confirmedChannels));
 	#ifdef MONITORING
-		cout << dbIdString
+		std::cout << dbIdString
 			 << "Number of registered channels = "
 			 << numberOfChannels
-			 << endl;
+			 << std::endl;
 	#endif
 
 	// Initialize all channels
@@ -762,20 +761,20 @@ Void TdfAccess::deRegisterReportIndication(const TdfDeRegisterReport & arg)
 	idaTrackExcept(("deRegisterReportIndication() received"));
 
 	#ifdef MONITORING
-		cout << dbIdString
+		std::cout << dbIdString
 			 << "deRegisterReportIndication message received,  "
 			 << PcpTime().formatTime().cString()
-			 << endl;
+			 << std::endl;
 	#endif
 
 	// Wir stoppen einen evtl. laufenden Registrierungs-Timer ...
 	cancelRegisterTimer();
 
-	// ... und weisen alle neuen Anfragen zurück mit:
+	// ... und weisen alle neuen Anfragen zurï¿½ck mit:
 	changeStatus(initialized);
 
-	// Anzahl verfügbarer Channels auf Null setzen
-//	channelMgr.setNoOfChannels(0);			// !!! eigentlich nur, wenn alle wartenden Requests gelöscht wurden
+	// Anzahl verfï¿½gbarer Channels auf Null setzen
+//	channelMgr.setNoOfChannels(0);			// !!! eigentlich nur, wenn alle wartenden Requests gelï¿½scht wurden
 
 	
 	// -------------------------------------------------------------------------
@@ -783,7 +782,7 @@ Void TdfAccess::deRegisterReportIndication(const TdfDeRegisterReport & arg)
 	idaTrackData(("TdfAccess::deRegisterReportIndication starts registration() "));
 	
 	// Ausgehend von der Annahme, das die Deregistrierung nur kurzzeitig ist, wird hier
-	// eine erneute Registrierung angstoßen
+	// eine erneute Registrierung angstoï¿½en
 	startRegistration();
 }
 
@@ -791,7 +790,7 @@ Void TdfAccess::deRegisterReportIndication(const TdfDeRegisterReport & arg)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Startet den Registertimer. Die Methode ist Flag-gesteuert und kann somit auch mehrfach 
-//	hintereinander aufgerufen werden, ohne das es zu Störungen kommt
+//	hintereinander aufgerufen werden, ohne das es zu Stï¿½rungen kommt
 //
 ReturnStatus TdfAccess::startRegisterTimer()
 {
@@ -806,7 +805,7 @@ ReturnStatus TdfAccess::startRegisterTimer()
 		{
 			idaTrackFatal(("Could not start register timer"));
 			#ifdef MONITORING
-				cout << dbIdString << "startRegisterTimer() failed" << endl;
+				std::cout << dbIdString << "startRegisterTimer() failed" << std::endl;
 			#endif
 			return isNotOk;
 		}
@@ -819,7 +818,7 @@ ReturnStatus TdfAccess::startRegisterTimer()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Löscht den evtl. laufenden Register-Timer (auch mehrfach aufrufbar)
+//	Lï¿½scht den evtl. laufenden Register-Timer (auch mehrfach aufrufbar)
 //	
 ReturnStatus TdfAccess::cancelRegisterTimer()
 {
@@ -842,10 +841,10 @@ ReturnStatus TdfAccess::cancelRegisterTimer()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Startet einen Timer für die zeitgesteuerte Reaktivierung der Methode "processSendQueue", 
+//	Startet einen Timer fï¿½r die zeitgesteuerte Reaktivierung der Methode "processSendQueue", 
 //	welche die Liste der Requests (requestPool) abarbeitet.
 //	(mehrfach aufrufbar, nicht nachtriggernd,
-//	d.h. durch Mehrfachaufruf verlängert sich die Wartezeit nicht)
+//	d.h. durch Mehrfachaufruf verlï¿½ngert sich die Wartezeit nicht)
 //
 ReturnStatus TdfAccess::startSendRetryTimer()
 {
@@ -858,7 +857,7 @@ ReturnStatus TdfAccess::startSendRetryTimer()
 		{
 			idaTrackFatal(("Could not start send retry timer"));
 			#ifdef MONITORING
-				cout << dbIdString << "startSendRetryTimer() failed" << endl;
+				std::cout << dbIdString << "startSendRetryTimer() failed" << std::endl;
 			#endif
 			return isNotOk;
 		}
@@ -904,7 +903,7 @@ Void TdfAccess::statusReportIndication(const TdfStatusReport& arg)
 #endif
 	
 	#ifdef MONITORING
-		cout << dbIdString << "statusReportIndication received" << endl;
+		std::cout << dbIdString << "statusReportIndication received" << std::endl;
 	#endif
 	
 	TdfStatusReport::Status dbStatus = arg.getStatus();
@@ -939,8 +938,8 @@ Void TdfAccess::modifyConfirmation( const TdfResponse & arg )
 //
 //  Implementierung einer Methode der abstrakten Superklasse "TdfClient".
 //
-//	Für jeden Request (Suchanfrage) an einen Datenbank-Server (NDIS) wird diese Methode vom
-//	OSAAPI-Framework aufgerufen, um die Antwort zurück zu liefern
+//	Fï¿½r jeden Request (Suchanfrage) an einen Datenbank-Server (NDIS) wird diese Methode vom
+//	OSAAPI-Framework aufgerufen, um die Antwort zurï¿½ck zu liefern
 //
 Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 {
@@ -962,7 +961,7 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 	idaTrackData(("TdfResponse:\n%s", tdfResponse.dumpString()));
 
 	// -------------------------------------------------------------------------
-	// Zuerst muß die Empfänger-OID aus dem zugehörigen Request-Objekt
+	// Zuerst muï¿½ die Empfï¿½nger-OID aus dem zugehï¿½rigen Request-Objekt
 	// ermittelt werden:
 	RequestContainer	requestContainer;
 	UShort				requestId	= tdfResponse.getReference();
@@ -974,12 +973,12 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 		idaTrackExcept(("TdfAccess::searchConfirmation: requestPool.getRequest failed"));
 
 		#ifdef MONITORING
-			cout << dbIdString << "requestPool.getRequest() failed" << endl;
+			std::cout << dbIdString << "requestPool.getRequest() failed" << std::endl;
 		#endif
 		
-		// Eigentlich müßten wir ein Fehler-Dokument zurück senden.
+		// Eigentlich mï¿½ï¿½ten wir ein Fehler-Dokument zurï¿½ck senden.
 		// Da wir den Adressaten aber nicht ermitteln konnten,
-		// können wir hier nicht tun !
+		// kï¿½nnen wir hier nicht tun !
 
 		return;
 	}
@@ -997,17 +996,17 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 			++dbCounter;
 			RelTime delta = PcpTime() - birth;
 			ULong dauer = delta.inMilliSeconds();
-			cout << dbIdString << "(" << requestId << ")DB searchtime : " << dauer << " [ms]" << endl;
+			std::cout << dbIdString << "(" << requestId << ")DB searchtime : " << dauer << " [ms]" << std::endl;
 			dbDauer += dauer;
 			if (dauer < dbDauerMin) dbDauerMin = dauer;
 			if (dauer > dbDauerMax) dbDauerMax = dauer;
 			if (dbCounter >= 100)
 			{
-				cout << dbIdString << "\t\t\t\t\t\tDatabase min/avg/max [ms] : " 
+				std::cout << dbIdString << "\t\t\t\t\t\tDatabase min/avg/max [ms] : " 
 					 << dbDauerMin << "/"
 					 << dbDauer / dbCounter << "/"
 					 << dbDauerMax
-					 << endl;
+					 << std::endl;
 				dbDauerMin = 1000000;
 				dbDauerMax = 0;
 				dbDauer = 0;
@@ -1018,19 +1017,19 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 
 	// --------------------------------------------------------------------------
 	// Resourcen freigeben:
-	// Timer löschen
+	// Timer lï¿½schen
 	stopTimer(timerId);
 	// Channel freigeben
 	channelMgr.releaseChannel(channel);
-	// TdfArgument-Objekt löschen !
+	// TdfArgument-Objekt lï¿½schen !
 	tmpTdfArg->reset();
 	DELETE(tmpTdfArg);
-	// Request aus der Liste löschen
+	// Request aus der Liste lï¿½schen
 	requestPool.removeRequest(requestId);
 
 
-	String xmlDocType;							// für den Dokument-Typ Bezeichner
-	String responseString;						// für die XML-gewandelten Antwortdaten
+	String xmlDocType;							// fï¿½r den Dokument-Typ Bezeichner
+	String responseString;						// fï¿½r die XML-gewandelten Antwortdaten
 	responseString.setReallocBlockSize(0x8000); // verhindert zu haefiges Reallozieren
 
 	// -------------------------------------------------------------------------
@@ -1163,10 +1162,10 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 		createXmlNode(xmlString, tagTdfLinkContext, result.cString());
 	}
 
-	// TdsDaten anhängen
+	// TdsDaten anhï¿½ngen
 	xmlString.cat(responseString);
 
-	// XML-Dokument abschließen
+	// XML-Dokument abschlieï¿½en
 	xmlString.cat(rootTagClose);
 
 	// -> der XML-String ist fertig
@@ -1195,17 +1194,17 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 			++responseCounter;
 			RelTime delta = Time() - timeStamp2;
 			ULong dauer = delta.inMilliSeconds();
-			cout << dbIdString << "(" << requestId << ")Response      : " << dauer << " [ms]" << endl;
+			std::cout << dbIdString << "(" << requestId << ")Response      : " << dauer << " [ms]" << std::endl;
 			responseDauer += dauer;
 			if (dauer < responseDauerMin) responseDauerMin = dauer;
 			if (dauer > responseDauerMax) responseDauerMax = dauer;
 			if (responseCounter >= 100)
 			{
-				cout << dbIdString << "\t\t\t\t\t\tResponse min/avg/max [ms] : " 
+				std::cout << dbIdString << "\t\t\t\t\t\tResponse min/avg/max [ms] : " 
 					 << responseDauerMin << "/"
 					 << responseDauer / responseCounter << "/"
 					 << responseDauerMax
-					 << endl;
+					 << std::endl;
 				responseDauerMin = 1000000;
 				responseDauerMax = 0;
 				responseDauer = 0;
@@ -1218,7 +1217,7 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 		
 	// -------------------------------------------------------------------------
 	// Der Response ist bearbeitet und ein ein Channel ist frei geworden
-	// Wir können nun versuchen eine Request aus der "waitingList" abzusenden.
+	// Wir kï¿½nnen nun versuchen eine Request aus der "waitingList" abzusenden.
 //	processSendQueue();
 		
 	return;
@@ -1228,8 +1227,8 @@ Void TdfAccess::searchConfirmation(const TdfResponse& tdfResponse)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Wenn ein TdfErrorArg vom Server geschickt wird müssen wir untersuchen, ob
-//	z. B. die Registrierung wiederholt werden muß
+//	Wenn ein TdfErrorArg vom Server geschickt wird mï¿½ssen wir untersuchen, ob
+//	z. B. die Registrierung wiederholt werden muï¿½
 // 
 Void TdfAccess::handleErrorArg(TdfErrorArg tdfErrorArg)
 {
@@ -1248,8 +1247,8 @@ Void TdfAccess::handleErrorArg(TdfErrorArg tdfErrorArg)
 		idaTrackData(("TdfErrorArg: ErrorSource = %s, ErrorClass = %s", vsSource.dumpString(), vsClass.dumpString()));
 
 		#ifdef MONITORING
-			cout << dbIdString << "ErrorClass = " 
-				 << vsClass.dumpString() << endl;
+			std::cout << dbIdString << "ErrorClass = " 
+				 << vsClass.dumpString() << std::endl;
 		#endif
 
 		switch (tdfErrorArg.getErrorClass())
@@ -1329,12 +1328,12 @@ Void TdfAccess::handleErrorArg(TdfErrorArg tdfErrorArg)
 //
 //  Implementierung einer Methode der abstrakten Superklasse "TdfClient".
 //
-//	Diese Methode erfüllt folgende Aufgaben:
+//	Diese Methode erfï¿½llt folgende Aufgaben:
 //
-//		1. Aufbau eines RequestContainer-Objektes mit allen für den Request
-//		   nötigen Context-Informationen
+//		1. Aufbau eines RequestContainer-Objektes mit allen fï¿½r den Request
+//		   nï¿½tigen Context-Informationen
 //		2. Eintragen des RequestContainer-Objektes in eine Request-Queue
-//		3. Aufruf der Behandlungsroutine für die Abwicklung des Sendevorgangs
+//		3. Aufruf der Behandlungsroutine fï¿½r die Abwicklung des Sendevorgangs
 //
 Void TdfAccess::applicationMessageBox(Message& message)
 {
@@ -1354,7 +1353,7 @@ Void TdfAccess::applicationMessageBox(Message& message)
 			// Hier wurde eine Nachricht mit falschem Typ empfangen
 			idaTrackExcept(("applicationMessageBox(): TdfProcess received unknown requesti %ld", message.getMsgType()));
 			#ifdef MONITORING
-				cout << dbIdString << "unknown request received" << endl;
+				std::cout << dbIdString << "unknown request received" << std::endl;
 			#endif
 	}
 }
@@ -1364,9 +1363,9 @@ Void TdfAccess::applicationMessageBox(Message& message)
 //
 //	Diese Methode behandelt einen Request gleich welcher Art (Login, Logout, Such-Request, ...) der
 //	von einem WebProcess kommt. Ihre Aufgabe ist, ein RequestContainer-Objekt anzulegen und
-//	mit allen benötigten Informationen zu füllen um den den Request "sende-fertig" in die Sende-Liste
-//	(= requestPool) einzutragen. Dazu gehört auch die Wandlung vom XML- in das proprietäre TDS-Format.
-//	Das eigentliche Senden (bzw. zuvor Authentifizieren) übernimmt dann die Methode processSendQueue.
+//	mit allen benï¿½tigten Informationen zu fï¿½llen um den den Request "sende-fertig" in die Sende-Liste
+//	(= requestPool) einzutragen. Dazu gehï¿½rt auch die Wandlung vom XML- in das proprietï¿½re TDS-Format.
+//	Das eigentliche Senden (bzw. zuvor Authentifizieren) ï¿½bernimmt dann die Methode processSendQueue.
 //
 Void TdfAccess::handleRequest(Message& message)
 {
@@ -1405,7 +1404,7 @@ Void TdfAccess::handleRequest(Message& message)
 	{
 		idaTrackFatal(("could not retreive data from message"));
 		#ifdef MONITORING
-			cout << dbIdString << "getData() failed" << endl;
+			std::cout << dbIdString << "getData() failed" << std::endl;
 		#endif
 		refuseRequest(requestContainer, "getDataError", "could not retreive data from message");
 		return;
@@ -1425,7 +1424,7 @@ Void TdfAccess::handleRequest(Message& message)
 	{
 		idaTrackFatal(("new DOMParser failed"));
 		#ifdef MONITORING
-			cout << "\t\t*** new DOMParser failed" << endl;
+			std::cout << "\t\t*** new DOMParser failed" << std::endl;
 		#endif
 	}
 
@@ -1447,36 +1446,36 @@ Void TdfAccess::handleRequest(Message& message)
 	{
 		idaTrackExcept(("XML Parse Error"));
 		#ifdef MONITORING
-			cout << dbIdString << "parser error" << endl;
+			std::cout << dbIdString << "parser error" << std::endl;
 		#endif
 		// Beim Parsen des XML-Requests ist ein Fehler aufgetreten.
 		// Das Fehler-Reporting hat bereits in parseXmlRequestToDom()
 		// stattgefunden.
 		// Die Anfrage kann nicht weiter bearbeitet werden und
-		// wird zurückgewiesen.
+		// wird zurï¿½ckgewiesen.
 		refuseRequest(requestContainer, "parserError", errorText);
 		return;
 	}
 
 	// -------------------------------------------------------------------------
-	// Wir holen den Wert für den timeout aus dem DOM und tragen diesen
+	// Wir holen den Wert fï¿½r den timeout aus dem DOM und tragen diesen
 	// in den RequestContainer ein.
 	ULong timeout = searchTimeOut;			// default aus der Konfigurationsdatei
 	getTimeoutFromDom(doc, timeout);		// Wenn dem Request ein eigener Timeout-Wert mit gegeben
 											// wurde, wird der Default-Wert in "timeout" hier
-											// überschrieben
+											// ï¿½berschrieben
 	requestContainer.setTimeout(timeout);	// ... und den Wert im Container speichern
 	idaTrackData(("timeout = %d [ms]", timeout));
 
 	// -------------------------------------------------------------------------
 	// Wir starten den Timer. Dieser bestimmt den Zeitpunkt, wann der Request
-	// unabhängig davon, wie weit er bearbeitet wurde, zurückgewiesen wird
+	// unabhï¿½ngig davon, wie weit er bearbeitet wurde, zurï¿½ckgewiesen wird
 	RefId timerId = 0;
 	if (startTimer(timerId, timeout, PcpTimerInterface::once) == isNotOk)
 	{
 		idaTrackFatal(("startTimer failed"));
 		#ifdef MONITORING
-			cout << dbIdString << "startTimer failed" << endl;
+			std::cout << dbIdString << "startTimer failed" << std::endl;
 		#endif
 		refuseRequest(requestContainer, "internalError", "startTimer failed");
 		return;
@@ -1485,18 +1484,18 @@ Void TdfAccess::handleRequest(Message& message)
 	
 	// -------------------------------------------------------------------------
 	#ifdef MONITORING
-		cout << dbIdString << "no authentication" << endl;
+		std::cout << dbIdString << "no authentication" << std::endl;
 	#endif
 	requestContainer.setStatus(RequestContainer::readyToSend);
 
 	// -------------------------------------------------------------------------
-	// Als nächstes muß festgestellt werden um welche Art von Request es sich handelt.
-	// Möglichkeiten sind: Login, Logout, ChangPwd und Request
-	// Der Typ wird über das Wurzel-Element bestimmt
+	// Als nï¿½chstes muï¿½ festgestellt werden um welche Art von Request es sich handelt.
+	// Mï¿½glichkeiten sind: Login, Logout, ChangPwd und Request
+	// Der Typ wird ï¿½ber das Wurzel-Element bestimmt
 	bool isModifyRequest = false;
 	String requestType;
 	getRootElementName(doc, requestType);
-	// Je nach Type muß anders vorgegangen werden
+	// Je nach Type muï¿½ anders vorgegangen werden
 	if (requestType == String("Login"))
 	{
 		idaTrackData(("request type: Login"));
@@ -1526,7 +1525,7 @@ Void TdfAccess::handleRequest(Message& message)
 		idaTrackData(("request type: Request"));
 		requestContainer.setMode(RequestContainer::request);
 		#ifdef MONITORING
-//			cout << dbIdString << "requestType is \"Request\"" << endl;
+//			std::cout << dbIdString << "requestType is \"Request\"" << std::endl;
 		#endif
 	}
 	else if (requestType == String("ModifyRequest"))
@@ -1535,7 +1534,7 @@ Void TdfAccess::handleRequest(Message& message)
 		requestContainer.setMode(RequestContainer::request);
 		isModifyRequest = true;
 		#ifdef MONITORING
-//			cout << dbIdString << "requestType is \"ModifyRequest\"" << endl;
+//			std::cout << dbIdString << "requestType is \"ModifyRequest\"" << std::endl;
 		#endif
 	}
 	else
@@ -1549,7 +1548,7 @@ Void TdfAccess::handleRequest(Message& message)
 
 	
 	// -------------------------------------------------------------------------
-	// Wir prüfen die Bereitschaft.
+	// Wir prï¿½fen die Bereitschaft.
 	// Wenn wir nicht registriert sind, nehmen wir keine Requests an
 	if (getStatus() != registered)
 	{
@@ -1568,7 +1567,7 @@ Void TdfAccess::handleRequest(Message& message)
         			}
         			catch (const XMLException& e)
         			{
-                			// Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+                			// Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                 			idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 			errorText.cat("\nError during Xerces cleanup:\n");
@@ -1585,7 +1584,7 @@ Void TdfAccess::handleRequest(Message& message)
         			}
         			catch (const XMLException& e)
         			{
-                			// Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+                			// Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                 			idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 			errorText.cat("\nError during Xerces cleanup:\n");
@@ -1602,7 +1601,7 @@ Void TdfAccess::handleRequest(Message& message)
         			}
         			catch (const XMLException& e)
         			{
-                			// Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+                			// Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                 			idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 			errorText.cat("\nError during Xerces cleanup:\n");
@@ -1633,7 +1632,7 @@ Void TdfAccess::handleRequest(Message& message)
 	{
 		idaTrackExcept(("Could not create TdsRequest/ModifyRequest from DOM"));
 		#ifdef MONITORING
-			cout << dbIdString << "error while creating tdsrequest/modifyrequest(" << errorText.cString() << ")" << endl;
+			std::cout << dbIdString << "error while creating tdsrequest/modifyrequest(" << errorText.cString() << ")" << std::endl;
 		#endif
 		// Fehler beim Aufbau des TdsRequest-Objektes
 		// Also wieder ein Fehler-Dokument senden
@@ -1645,7 +1644,7 @@ Void TdfAccess::handleRequest(Message& message)
        			}
        			catch (const XMLException& e)
        			{
-               			// Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+               			// Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                			idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 		errorText.cat("\nError during Xerces cleanup:\n");
@@ -1691,7 +1690,7 @@ Void TdfAccess::handleRequest(Message& message)
 	{
 		idaTrackExcept(("Could not create TdfArgument-Object"));
 		#ifdef MONITORING
-			cout << dbIdString << "error while creating tdfargument" << endl;
+			std::cout << dbIdString << "error while creating tdfargument" << std::endl;
 		#endif
 		refuseRequest(requestContainer, "requestCreationError", errorText);
    			try{
@@ -1700,7 +1699,7 @@ Void TdfAccess::handleRequest(Message& message)
        			}
        			catch (const XMLException& e)
        			{
-               			// Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+               			// Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                			idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 		errorText.cat("\nError during Xerces cleanup:\n");
@@ -1721,7 +1720,7 @@ Void TdfAccess::handleRequest(Message& message)
 	}
         catch (const XMLException& e)
     	{
-                // Ein Fehler ist beim Aufräumen der XML Platform aufgetreten
+                // Ein Fehler ist beim Aufrï¿½umen der XML Platform aufgetreten
                 idaTrackExcept(("TdfAccess::parseXml failed"));
 
                 errorText.cat("\nError during Xerces cleanup:\n");
@@ -1740,22 +1739,22 @@ Void TdfAccess::handleRequest(Message& message)
 */
 	
 	// -------------------------------------------------------------------------
-	// Jetzt sollte der Request bereit zum Senden sein. Wir prüfen das nach
+	// Jetzt sollte der Request bereit zum Senden sein. Wir prï¿½fen das nach
 //	requestContainer.checkStatus();		// Dieser Call setzt auch den internen Status
 //	if (requestContainer.getStatus() != RequestContainer::readyToSend)
 //	{
 //		#ifdef MONITORING
-//			cout << dbIdString << "Request was not prepared correctly" << endl;
+//			std::cout << dbIdString << "Request was not prepared correctly" << std::endl;
 //		#endif
 //	}
 	
 	// -------------------------------------------------------------------------
-	// Jetzt muß der RequestContainer noch in die SendQueue eingetragen werden
+	// Jetzt muï¿½ der RequestContainer noch in die SendQueue eingetragen werden
 	requestPool.addRequest(requestContainer);
 
 	
 	// -------------------------------------------------------------------------
-	// Als letztes wird der Sendevorgang angstoßen
+	// Als letztes wird der Sendevorgang angstoï¿½en
 	processSendQueue();
 
 	#ifdef MONITORING
@@ -1763,17 +1762,17 @@ Void TdfAccess::handleRequest(Message& message)
 			++requestCounter;
 			RelTime delta = PcpTime() - timeStamp1;
 			ULong dauer = delta.inMilliSeconds();
-			cout << dbIdString << "(" << requestId << ")Request       : " << dauer << " [ms]" << endl;
+			std::cout << dbIdString << "(" << requestId << ")Request       : " << dauer << " [ms]" << std::endl;
 			requestDauer += dauer;
 			if (dauer < requestDauerMin) requestDauerMin = dauer;
 			if (dauer > requestDauerMax) requestDauerMax = dauer;
 			if (requestCounter >= 100)
 			{
-				cout << dbIdString << "\t\t\t\t\t\tRequest  min/avg/max [ms] : " 
+				std::cout << dbIdString << "\t\t\t\t\t\tRequest  min/avg/max [ms] : " 
 					 << requestDauerMin << "/"
 					 << requestDauer / requestCounter << "/"
 					 << requestDauerMax
-					 << endl;
+					 << std::endl;
 				requestDauerMin = 1000000;
 				requestDauerMax = 0;
 				requestDauer = 0;
@@ -1858,7 +1857,7 @@ Void TdfAccess::sendAuthenticationAcknowledge(RequestContainer& requestContainer
 //
 //  Implementierung einer Methode der abstrakten Superklasse "PcpTimerInterface".
 //
-//	Alle Timer-Events lösen einen Aufruf dieser Methode aus.
+//	Alle Timer-Events lï¿½sen einen Aufruf dieser Methode aus.
 //	
 Void TdfAccess::timerBox(const RefId id)
 {
@@ -1873,14 +1872,14 @@ Void TdfAccess::timerBox(const RefId id)
 	if (id == registerTimerId)
 	{
 		// Da registerTimerFlag immer anzeigen soll, ob der Timer aktiv ist
-		// oder nicht, muß das Flag hier gelöscht werden
+		// oder nicht, muï¿½ das Flag hier gelï¿½scht werden
 		registerTimerFlag = false;
 		
 		idaTrackExcept(("Handling register timeout"));
 		PROBLEM(myObjectId, iDAMinRepClass, 109, countryCode);
 		
 		#ifdef MONITORING
-			cout << dbIdString << "TdfAccess::timerBox() : register timer event" << endl;
+			std::cout << dbIdString << "TdfAccess::timerBox() : register timer event" << std::endl;
 		#endif
 
 
@@ -1897,7 +1896,7 @@ Void TdfAccess::timerBox(const RefId id)
 
 		idaTrackExcept(("send retry timer timeout"));
 		#ifdef MONITORING
-			cout << dbIdString << "TdfAccess::timerBox() : send retry timer timeout" << endl;
+			std::cout << dbIdString << "TdfAccess::timerBox() : send retry timer timeout" << std::endl;
 		#endif
 		
 		// Es wird Zeit zu versuchen evtl. Request erneut zu senden, die zuvor nicht
@@ -1913,7 +1912,7 @@ Void TdfAccess::timerBox(const RefId id)
 		idaTrackExcept(("Request timeout, item is removed from sendqueue"));
 		PROBLEM(myObjectId, iDAMinRepClass, 110, "");
 		#ifdef MONITORING
-			cout << dbIdString << "\t\t\t\t*** Request removed from requestPool (timeout)" << endl;
+			std::cout << dbIdString << "\t\t\t\t*** Request removed from requestPool (timeout)" << std::endl;
 		#endif
 
 		// wir holen die Request-Daten aus der Request-Liste
@@ -1924,7 +1923,7 @@ Void TdfAccess::timerBox(const RefId id)
 		if (requestContainer.getStatus() == RequestContainer::sendAndWaiting)
 		{
 			#ifdef MONITORING
-				cout << dbIdString << "\t\t\t\t*** sending cancelSearchRequest()" << endl;
+				std::cout << dbIdString << "\t\t\t\t*** sending cancelSearchRequest()" << std::endl;
 			#endif
 			TdfCancelSearchArg tdfCancelSearchArg;
 			tdfCancelSearchArg.setApplicationId(requestContainer.getTdfArgument()->getApplicationId());
@@ -1934,16 +1933,16 @@ Void TdfAccess::timerBox(const RefId id)
 			#ifdef MONITORING
 				if (res == isOk)
 				{
-					cout << dbIdString << "\t\t\t\t*** cancelSearchRequest() == isOk" << endl;
+					std::cout << dbIdString << "\t\t\t\t*** cancelSearchRequest() == isOk" << std::endl;
 				}
 				else
 				{
-					cout << dbIdString << "\t\t\t\t*** cancelSearchRequest() == isNotOk" << endl;
+					std::cout << dbIdString << "\t\t\t\t*** cancelSearchRequest() == isNotOk" << std::endl;
 					OsaComError error = getLastError();
 					#ifdef MONITORING
-						cout << "cancelSearchRequest() failed: " << error.getErrorCode() << "\n\t"
+						std::cout << "cancelSearchRequest() failed: " << error.getErrorCode() << "\n\t"
 							 << error.getErrorSource() << "\n\t"
-							 << error.getErrorText() << endl;
+							 << error.getErrorText() << std::endl;
 					#endif
 
 				}
@@ -1953,13 +1952,13 @@ Void TdfAccess::timerBox(const RefId id)
 		// Wir schicken ein Fehler-Dokument
 		refuseRequest(requestContainer, "timeout", "request timeout, item is removed from sendqueue");
 
-		// TdfArgument-Objekt löschen !
+		// TdfArgument-Objekt lï¿½schen !
 		TdfArgument* tdfArgument = requestContainer.getTdfArgument();
 		DELETE(tdfArgument);
 
 		channelMgr.releaseChannel(requestContainer.getChannel());
 
-		// Request aus der Liste löschen
+		// Request aus der Liste lï¿½schen
 		requestPool.removeRequest(requestContainer.getRequestId());
 
 		return;
@@ -2061,7 +2060,7 @@ ReturnStatus TdfAccess::createXmlNode(String& xmlString, const String& tag, cons
 			default:
 				xmlString.cat(*value);
 		}
-		// Zur Sicherheit, dass keine Endlosschleife enstehen kann
+		// Zur Sicherheit, dass keine std::endlosschleife enstehen kann
       // Can this really happen? Since I'n not sure I will use the maximum
       // possible number. 255 characters are definitely not enough and
       // will lead to data loss in some cases.
@@ -2125,7 +2124,7 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 	typeString = "error";
 
 	Bool errorFlag	= false;		// Zeigt an, ob Fehler gemeldet wurden
-	Int  records	= 0;			// Anzahl Records, wir später gebraucht um den typeString richtig zu setzen
+	Int  records	= 0;			// Anzahl Records, wir spï¿½ter gebraucht um den typeString richtig zu setzen
 
 	// -----------------------------------------------------------------------------
 	// SearchResult
@@ -2307,7 +2306,7 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 		if (resultData.isFormatIdSet())
 		{
 			// ***********************************************************
-			// ACHTUNG: Hier wird nur "indentedRecordFormat" unterstützt !
+			// ACHTUNG: Hier wird nur "indentedRecordFormat" unterstï¿½tzt !
 			// ***********************************************************
 
 			if (resultData.getFormatId() == ResultData::indentedRecordFormat)
@@ -2363,10 +2362,10 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 			// An dieser Stelle wird die implizit per IndentLevel gegebene
 			// Hierarchie der Records in eine explizite XML-Struktur gewandelt
 			// D.h. die Records kommen nicht mehr einfach hintereinander, sondern
-			// sind ihrem IndentLevel entsprechend baumartig verknüpft
+			// sind ihrem IndentLevel entsprechend baumartig verknï¿½pft
 			//
-			// Bei der Iteration über die Records wird dazu immer der Pegel
-			// an ausstehenden "schließenden XML-Tags" verwaltet
+			// Bei der Iteration ï¿½ber die Records wird dazu immer der Pegel
+			// an ausstehenden "schlieï¿½enden XML-Tags" verwaltet
 			// Kommt 
 			int actLevel = 0;
 			int pendingTags = 0;
@@ -2380,9 +2379,9 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 					indentLevel = indentRecord.getIndentLevel();
 				}
 
-				// Bei Folgeanfragen (Blättern) kann es vorkommen, dass der Record
-				// nicht den Level 0 hat. In diesem Fall müssen zusätzliche 
-				// öffnende Tags eingebaut werden.
+				// Bei Folgeanfragen (Blï¿½ttern) kann es vorkommen, dass der Record
+				// nicht den Level 0 hat. In diesem Fall mï¿½ssen zusï¿½tzliche 
+				// ï¿½ffnende Tags eingebaut werden.
 				if (index == 0)
 				{
 					for (int i = 0; i < indentLevel; i++)
@@ -2405,7 +2404,7 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 					}
 				}
 
-				// Öffnendes Tag
+				// ï¿½ffnendes Tag
 				xmlString.cat(tagoRecord);
 				++pendingTags;
 
@@ -2444,9 +2443,9 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 	}
 
 	// ---------------------------------------------------------------------------------------------
-	// Evtl. muß der typeString noch korrigiert werden:
+	// Evtl. muï¿½ der typeString noch korrigiert werden:
 	// Wenn keine Records geliefert wurden, eine Fehler sowie der RekordType gesetzt wurden,
-	// dann soll "error" zurück gegeben werden !
+	// dann soll "error" zurï¿½ck gegeben werden !
 	if ((records == 0) && errorFlag)
 	{
 		typeString = "error";
@@ -2460,7 +2459,7 @@ ReturnStatus TdfAccess::convTdsResponseToXml(TdsResponse& tdsResponse,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Die "indented" Records werden in dieser Methode in das XML-Format umgewandelt und an den
-//	übergebenen "xmlString" angehängt
+//	ï¿½bergebenen "xmlString" angehï¿½ngt
 //
 ReturnStatus TdfAccess::convIndentRecordToXml(String& xmlString,
 										  IndentRecord& indentRecord)
@@ -2571,7 +2570,7 @@ ReturnStatus TdfAccess::convIndentRecordToXml(String& xmlString,
 		SetOfDbAttribute& setOfDbAttribute
 		= (SetOfDbAttribute &)(indentRecord.getSetOfDbAttribute());
 
-		// Iteration über die DbAttribute Objekte
+		// Iteration ï¿½ber die DbAttribute Objekte
 		SetOfDbAttribute::iterator sIterator = (SetOfDbAttribute::iterator)setOfDbAttribute.begin();
 		while (sIterator != setOfDbAttribute.end())
 		{
@@ -2613,7 +2612,7 @@ ReturnStatus TdfAccess::convTdfErrorArgToXml(TdfErrorArg& tdfErrorArg,
 
 	typeString = "error";
 
-	xmlString.cat(tagoSearchResult);	// öffnender Tag
+	xmlString.cat(tagoSearchResult);	// ï¿½ffnender Tag
 
 	// ---------------------------------------------------------------
 
@@ -2630,7 +2629,7 @@ ReturnStatus TdfAccess::convTdfErrorArgToXml(TdfErrorArg& tdfErrorArg,
 		enumToString(tdfErrorArg.getErrorClass(), vString);
 		createXmlNode(xmlString, tagErrorCode, vString.getDataString());
 		#ifdef MONITORING
-			cout << "\t\t\t\t*** ErrorClass=" << vString.getDataString() << endl;
+			std::cout << "\t\t\t\t*** ErrorClass=" << vString.getDataString() << std::endl;
 		#endif
 	}
 
@@ -2646,7 +2645,7 @@ ReturnStatus TdfAccess::convTdfErrorArgToXml(TdfErrorArg& tdfErrorArg,
 
 	// ---------------------------------------------------------------
 
-	xmlString.cat(tagcSearchResult);	// schließender Tag
+	xmlString.cat(tagcSearchResult);	// schlieï¿½ender Tag
 
 	return isOk;
 }
@@ -2672,10 +2671,10 @@ ReturnStatus TdfAccess::sendBigString(RefId			serverOid,	// OID des Servers
 	// Zerlegen & Senden:
 	Types::TransferHeader header;
 
-	// Länge der Payload berechnen
+	// Lï¿½nge der Payload berechnen
 	int         maxBlockSize    = Types::MAX_CLASSLIB_MSG_SIZE - sizeof(header) - 1;
 
-	// Länge des gesamten zu uebertragenen Strings holen
+	// Lï¿½nge des gesamten zu uebertragenen Strings holen
 	int         restStringSize  = string.cStringLen() + 1;
 
 	// Speicher fuer message anlegen
@@ -2754,7 +2753,7 @@ ReturnStatus TdfAccess::sendBigString(RefId			serverOid,	// OID des Servers
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Umwandlung einer Binär-Zeichnkette in einen Hex-String damit dieser problemloser in ein
+//	Umwandlung einer Binï¿½r-Zeichnkette in einen Hex-String damit dieser problemloser in ein
 //	XML-Dokument integriert werden kann
 //
 Void TdfAccess::dataToHexString(String byteSequence, String& result)
@@ -2777,7 +2776,7 @@ Void TdfAccess::dataToHexString(String byteSequence, String& result)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //	In dieser Methode wird der XML-Parser "XERCES" angelegt und aufgerufen. Er erzeugt aus dem 
-//	XML-Dokument (als String übergeben) eine mit den Daten gefüllte DOM-Struktur
+//	XML-Dokument (als String ï¿½bergeben) eine mit den Daten gefï¿½llte DOM-Struktur
 //
 ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 											 XercesDOMParser* parser,
@@ -2790,10 +2789,10 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 	errorText = "";
 
 	#ifdef MONITORING
-//		cout << xmlString << endl << endl << endl;
+//		std::cout << xmlString << std::endl << std::endl << std::endl;
 	#endif
 
-	// Aus dem String wird zunächst eine Speicherstruktur erzeugt, die vom Parser
+	// Aus dem String wird zunï¿½chst eine Speicherstruktur erzeugt, die vom Parser
 	// als Input benutzt werden kann
 	XMLCh* xmlChar = (XMLCh*)"tdfProcess";
 
@@ -2810,7 +2809,7 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 	{
 		idaTrackFatal(("new MemBufInputSource failed"));
 		#ifdef MONITORING
-			cout << "\t\t*** new MemBufInputSource failed" << endl;
+			std::cout << "\t\t*** new MemBufInputSource failed" << std::endl;
 		#endif
 		return isNotOk;
 	}	
@@ -2825,7 +2824,7 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 	catch (const XMLException& e)
     {
    	  	#ifdef MONITORING
-			cout << dbIdString << "Fehler beim Parsen" << endl;
+			std::cout << dbIdString << "Fehler beim Parsen" << std::endl;
 		#endif
 		
 		// Ein Fehler ist beim Parsen aufgetreten
@@ -2843,7 +2842,7 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 	if (!errorText.isEmpty())
 	{
    	  	#ifdef MONITORING
-			cout << dbIdString << "Fehler beim Parsen" << endl;
+			std::cout << dbIdString << "Fehler beim Parsen" << std::endl;
 		#endif
 		
 		// Der Fehlertext (errorText) wird bereits vom errorHandler gesetzt
@@ -2857,7 +2856,7 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 	}
 
 
-	// Dokument übergeben
+	// Dokument ï¿½bergeben
 	doc = parser->getDocument();
 //	doc = parser->adoptDocument();
 
@@ -2869,7 +2868,7 @@ ReturnStatus TdfAccess::parseXmlRequestToDom(String& xmlString,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Die Methode erzeugt aus einem als Text übergebenen Fehler ein gültiges 
+//	Die Methode erzeugt aus einem als Text ï¿½bergebenen Fehler ein gï¿½ltiges 
 //	XML Dokument
 //
 ReturnStatus TdfAccess::formatXMLErrorResponse(String& xmlString,
@@ -2910,7 +2909,7 @@ ReturnStatus TdfAccess::createModifyRequestFromDom(ModifyRequest& modifyRequest,
 
 
         #ifdef XML_REQ_MON
-                cout << dbIdString << "TdsRequest" << endl;
+                std::cout << dbIdString << "TdsRequest" << std::endl;
         #endif
 
         errorText = "error while creating TdsRequest";
@@ -2920,7 +2919,7 @@ ReturnStatus TdfAccess::createModifyRequestFromDom(ModifyRequest& modifyRequest,
         if(root==null)
         {
                 #ifdef MONITORING
-                        cout << dbIdString << "\t\t\t\t\t\t*** getDocumentElement() failed" << endl;
+                        std::cout << dbIdString << "\t\t\t\t\t\t*** getDocumentElement() failed" << std::endl;
                 #endif
                 errorText = "getDocumentElement() failed -> no document root element found";
                 return isNotOk;
@@ -2940,7 +2939,7 @@ ReturnStatus TdfAccess::createModifyRequestFromDom(ModifyRequest& modifyRequest,
                 // Knoten i holen
                 child = childsFromRoot->item(i);
 
-                // Knoten-Typ prüfen
+                // Knoten-Typ prï¿½fen
                 if (DOMNode::ELEMENT_NODE == child->getNodeType())
                 {
                         // Namen des Knoten holen
@@ -2990,7 +2989,7 @@ ReturnStatus TdfAccess::createModifyRequestFromDom(ModifyRequest& modifyRequest,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Diese Methode füllt aus den Daten, übergeben als DOM-Struktur, ein TdsRequest-Objekt.
+//	Diese Methode fï¿½llt aus den Daten, ï¿½bergeben als DOM-Struktur, ein TdsRequest-Objekt.
 //
 //
 //	*****************************************************************************
@@ -3008,7 +3007,7 @@ ReturnStatus TdfAccess::createTdsRequestFromDom(TdsRequest& tdsRequest,
 
 	
 	#ifdef XML_REQ_MON
-		cout << dbIdString << "TdsRequest" << endl;
+		std::cout << dbIdString << "TdsRequest" << std::endl;
 	#endif
 	
 	errorText = "error while creating TdsRequest";
@@ -3018,7 +3017,7 @@ ReturnStatus TdfAccess::createTdsRequestFromDom(TdsRequest& tdsRequest,
 	if(root==null)
 	{
 		#ifdef MONITORING
-			cout << dbIdString << "\t\t\t\t\t\t*** getDocumentElement() failed" << endl;
+			std::cout << dbIdString << "\t\t\t\t\t\t*** getDocumentElement() failed" << std::endl;
 		#endif
 		errorText = "getDocumentElement() failed -> no document root elemente found";
 		return isNotOk;
@@ -3031,13 +3030,13 @@ ReturnStatus TdfAccess::createTdsRequestFromDom(TdsRequest& tdsRequest,
 
 
 	// -------------------------------------------------------------------------
-	// Iteration über alle Kinder des Root-Knoten
+	// Iteration ï¿½ber alle Kinder des Root-Knoten
 	for (int i = 0; i < childsFromRoot->getLength(); i++)
 	{
 		// Knoten i holen
 		child = childsFromRoot->item(i);
 
-		// Knoten-Typ prüfen
+		// Knoten-Typ prï¿½fen
 		if (DOMNode::ELEMENT_NODE == child->getNodeType())
 		{
 			// Namen des Knoten holen
@@ -3095,7 +3094,7 @@ ReturnStatus TdfAccess::createTdsRequestFromDom(TdsRequest& tdsRequest,
 //
 //	SearchSpec erzeugen:
 //
-//	Ein Validierung wird dem Parser beim Einlesen des XML-Strings überlassen !
+//	Ein Validierung wird dem Parser beim Einlesen des XML-Strings ï¿½berlassen !
 //
 ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNode* node, String& errorText)
 {
@@ -3112,7 +3111,7 @@ ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNod
 	ULong enumVal;
 
 	#ifdef XML_REQ_MON
-		cout << dbIdString << "\tSearchSpec" << endl;
+		std::cout << dbIdString << "\tSearchSpec" << std::endl;
 	#endif
 
 	errorText = "XML:Request/SearchSpecification: missing parameter";
@@ -3138,7 +3137,7 @@ ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNod
 				if (StringToEnum::enumOfOperation(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tOperation = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tOperation = " << stringValue << std::endl;
 					#endif
 					searchSpec.setOperation((SearchSpec::Operation)enumVal);
 					continue;
@@ -3156,7 +3155,7 @@ ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNod
 			if (getValueOfDomNode(stringValue, child) == isOk)
 			{
 				#ifdef XML_REQ_MON
-					cout << dbIdString << "\t\tLinkContext = " << stringValue << endl;
+					std::cout << dbIdString << "\t\tLinkContext = " << stringValue << std::endl;
 				#endif
 				searchSpec.setLinkContext(hexToData(stringValue.cString()));
 			}
@@ -3172,7 +3171,7 @@ ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNod
 				if (StringToEnum::enumOfCharacterSet(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tOsaCharacterSet = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tOsaCharacterSet = " << stringValue << std::endl;
 					#endif
 					searchSpec.setUsedCharacterSet((SearchSpec::CharacterSet)enumVal);
 					continue;
@@ -3187,7 +3186,7 @@ ReturnStatus TdfAccess::createSearchSpecification(TdsRequest& tdsRequest, DOMNod
 
 
 	// -------------------------------------------------------------------------
-	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhängen
+	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhï¿½ngen
 	tdsRequest.setSearchSpecification(searchSpec);
 	
 	return result;
@@ -3212,7 +3211,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 	String stringValue;
 
 	#ifdef XML_REQ_MON
-		cout << dbIdString << "\tSearchVariation" << endl;
+		std::cout << dbIdString << "\tSearchVariation" << std::endl;
 	#endif
 	
 	DOMNodeList* nodeList = node->getChildNodes();
@@ -3237,7 +3236,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 				if (StringToEnum::enumOfSearchType(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tSearchType = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tSearchType = " << stringValue << std::endl;
 					#endif
 					searchVar.setSearchType((SearchVar::SearchType)enumVal);
 					continue;
@@ -3257,7 +3256,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 				if (StringToEnum::enumOfExpansion(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tExpansion = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tExpansion = " << stringValue << std::endl;
 					#endif
 					searchVar.setExpansion((SearchVar::Expansion)enumVal);
 					continue;
@@ -3275,7 +3274,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 			if (getValueOfDomNode(stringValue, child) == isOk)
 			{
 				#ifdef XML_REQ_MON
-					cout << dbIdString << "\t\tExpansionRange = " << stringValue << endl;
+					std::cout << dbIdString << "\t\tExpansionRange = " << stringValue << std::endl;
 				#endif
 				searchVar.setExpansionRange(VisibleString(stringValue.cString()));
 				continue;
@@ -3289,7 +3288,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 			if (getValueOfDomNode(stringValue, child) == isOk)
 			{
 				#ifdef XML_REQ_MON
-					cout << dbIdString << "\t\tIndentLevelFilter = " << stringValue << endl;
+					std::cout << dbIdString << "\t\tIndentLevelFilter = " << stringValue << std::endl;
 				#endif
 				searchVar.setIndentLevelFilter(stringValue.cString());
 				continue;
@@ -3305,7 +3304,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 				if (StringToEnum::enumOfSearchVar(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tVariation = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tVariation = " << stringValue << std::endl;
 					#endif
 					variation += enumVal;
 					continue;
@@ -3320,7 +3319,7 @@ ReturnStatus TdfAccess::createSearchVariation(TdsRequest& tdsRequest, DOMNode* n
 	if (variation) searchVar.setHelper1(variation);
 
 	// -------------------------------------------------------------------------
-	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhängen
+	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhï¿½ngen
 	tdsRequest.setSearchVariation(searchVar);
 	
 	return result;
@@ -3345,12 +3344,12 @@ ReturnStatus TdfAccess::createRequestedResponse(TdsRequest& tdsRequest, DOMNode*
 	String stringValue;
 
 	#ifdef XML_REQ_MON
-		cout << dbIdString << "\tRequestedResponse" << endl;
+		std::cout << dbIdString << "\tRequestedResponse" << std::endl;
 	#endif
 	
 	// -------------------------------------------------------------------------
 	// SearchVariation/RequestedFormat:
-	// Diesen Parameter setzen wir fest ein, da es keine andere Möglichkeit gibt
+	// Diesen Parameter setzen wir fest ein, da es keine andere Mï¿½glichkeit gibt
 	requestedRes.setRequestedFormat(RequestedRes::indentedRecordFormat);
 
 
@@ -3375,7 +3374,7 @@ ReturnStatus TdfAccess::createRequestedResponse(TdsRequest& tdsRequest, DOMNode*
 			if (getValueOfDomNode(stringValue, child) == isOk)
 			{
 				#ifdef XML_REQ_MON
-					cout << dbIdString << "\t\tMaxRecords = " << stringValue << endl;
+					std::cout << dbIdString << "\t\tMaxRecords = " << stringValue << std::endl;
 				#endif
 				requestedRes.setMaxRecords(ushortOfString(stringValue.cString()));
 				continue;
@@ -3389,7 +3388,7 @@ ReturnStatus TdfAccess::createRequestedResponse(TdsRequest& tdsRequest, DOMNode*
 			if (getValueOfDomNode(stringValue, child) == isOk)
 			{
 				#ifdef XML_REQ_MON
-					cout << dbIdString << "\t\tOrdering = " << stringValue << endl;
+					std::cout << dbIdString << "\t\tOrdering = " << stringValue << std::endl;
 				#endif
 				requestedRes.setOrdering(stringValue.cString());
 				continue;
@@ -3405,7 +3404,7 @@ ReturnStatus TdfAccess::createRequestedResponse(TdsRequest& tdsRequest, DOMNode*
 				if (StringToEnum::enumOfDbAttribute(enumVal, stringValue.cString()) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\tDbAttribute = " << stringValue << endl;
+						std::cout << dbIdString << "\t\tDbAttribute = " << stringValue << std::endl;
 					#endif
 					setOfAttributeId.insert((DbAttribute::AttributeId)enumVal);
 					attrFlag = true;
@@ -3419,7 +3418,7 @@ ReturnStatus TdfAccess::createRequestedResponse(TdsRequest& tdsRequest, DOMNode*
 	}
 
 	// -------------------------------------------------------------------------
-	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhängen
+	// ... und jetzt noch das ganze ... in's TdsRequest-Object einhï¿½ngen
 	if (attrFlag) requestedRes.setSearchFilter(setOfAttributeId);
 	tdsRequest.setRequestedResponse(requestedRes);
 	
@@ -3441,7 +3440,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 	VectorOfSearchAttr vectorOfSearchAttr;
 
 	#ifdef XML_REQ_MON
-		cout << dbIdString << "\tSearchAttributes" << endl;
+		std::cout << dbIdString << "\tSearchAttributes" << std::endl;
 	#endif
 	
 	DOMNode* child;
@@ -3459,12 +3458,12 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 	idaTrackTrace(("TdfAccess::createSearchAttributes after child = node->getFirstChild()"));
 	
 	// -------------------------------------------------------------------------
-	// Iteration über alle SearchAttr-Knoten
+	// Iteration ï¿½ber alle SearchAttr-Knoten
 	while (!child==null)
 	{
 	  idaTrackTrace(("TdfAccess::createSearchAttributes after !child==null"));
 		// ---------------------------------------------------------------------
-		// Für alle Fälle prüfen wir mal, ob wir nicht etwas falsches bekommen haben
+		// Fï¿½r alle Fï¿½lle prï¿½fen wir mal, ob wir nicht etwas falsches bekommen haben
 		const XMLCh* name = child->getNodeName();
 		idaTrackTrace(("TdfAccess::createSearchAttributes after child->getNodeName()"));
 		char* transName = XMLString::transcode(name);
@@ -3472,7 +3471,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 		if (0 != strcmp(Cpd(transName), "SearchAttr"))
 		{
 		  idaTrackTrace(("TdfAccess::createSearchAttributes after strcmp(Cpd(transName)"));
-			// wenn doch, dann mit dem nächsten Knoten weiter machen
+			// wenn doch, dann mit dem nï¿½chsten Knoten weiter machen
 			child = child->getNextSibling();
 			continue;
 		}
@@ -3489,7 +3488,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 
 		idaTrackTrace(("TdfAccess::createSearchAttributes before DOMNodeList* nodeList = child->getChildNodes()"));
 		// ---------------------------------------------------------------------
-		// Wenn der Knoten keine Kinder hat, machen wir auch mit dem nächsten weiter
+		// Wenn der Knoten keine Kinder hat, machen wir auch mit dem nï¿½chsten weiter
 		DOMNodeList* nodeList = child->getChildNodes();
 		if (0 == nodeList->getLength())
 		{
@@ -3498,16 +3497,16 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 		}
 
 		#ifdef XML_REQ_MON
-		cout << dbIdString << "\t\tSearchAttr" << endl;
+		std::cout << dbIdString << "\t\tSearchAttr" << std::endl;
 		#endif
 		
 		idaTrackTrace(("TdfAccess::createSearchAttributes before  for (int i = 0; i < nodeList->getLength(); i++)"));
 		// ---------------------------------------------------------------------
 		// Wir haben eine SearchAttr Knoten gefunden, der auch Kinder hat.
-		// Es folgt eine Iteration über alle Kinder
+		// Es folgt eine Iteration ï¿½ber alle Kinder
 		SearchAttr searchAttr;
 		searchAttr.reset();
-		ULong variation = 0;			// für die Variation
+		ULong variation = 0;			// fï¿½r die Variation
 		Bool legalAttribut = false;		// Flag zur Schleifensteuerung
 		
 		for (int i = 0; i < nodeList->getLength(); i++)
@@ -3528,11 +3527,11 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 					if (StringToEnum::enumOfAttributeId(enumVal, stringValue.cString()) == isOk)
 					{
 						#ifdef XML_REQ_MON
-							cout << dbIdString << "\t\t\tAttribute = " << stringValue << endl;
+							std::cout << dbIdString << "\t\t\tAttribute = " << stringValue << std::endl;
 						#endif
 						searchAttr.setAttributeId((SearchAttr::AttributeId)enumVal);
 						 idaTrackData(("XML:Request/SearchAttributes/Attribute: "));	
-						// Der Attribut-Name war gültig
+						// Der Attribut-Name war gï¿½ltig
 						legalAttribut = true;
 						continue;
 					}
@@ -3547,7 +3546,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 				if (getValueOfDomNode(stringValue, childChild) == isOk)
 				{
 					#ifdef XML_REQ_MON
-						cout << dbIdString << "\t\t\tValue = " << stringValue.cString() << endl;
+						std::cout << dbIdString << "\t\t\tValue = " << stringValue.cString() << std::endl;
 					#endif
 					searchAttr.setAttributeValue(stringValue.cString());
 				 	idaTrackData(("XML:Request/SearchAttributes/Attribute/Value : %s", stringValue.cString() ));	
@@ -3565,7 +3564,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 					if (StringToEnum::enumOfSearchAttr(enumVal, stringValue.cString()) == isOk)
 					{
 						#ifdef XML_REQ_MON
-							cout << dbIdString << "\t\t\tVariation = " << stringValue << endl;
+							std::cout << dbIdString << "\t\t\tVariation = " << stringValue << std::endl;
 						#endif
 						variation += enumVal;
 						idaTrackData(("XML:Request/SearchAttributes/Variation : %s", stringValue.cString() ));
@@ -3578,10 +3577,10 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 			}
 		}
 		// ---------------------------------------------------------------------
-		// Wenn ein gültiges Attribut gefunden wurde ...
+		// Wenn ein gï¿½ltiges Attribut gefunden wurde ...
 		if (legalAttribut)
 		{
-			// ... dann muß noch geprüft werden, ob variations gesetzt wurden ...
+			// ... dann muï¿½ noch geprï¿½ft werden, ob variations gesetzt wurden ...
 			if (variation != 0) searchAttr.setHelper1(variation);
 
 			// ... bevor man das SearchAttr-Objekt in den Vector eintragen kann
@@ -3602,7 +3601,7 @@ ReturnStatus TdfAccess::createSearchAttributes(TdsRequest& tdsRequest, DOMNode* 
 //
 //	Holt den Wert eines DOM-Knotens. Das Ergebnis der Methode ist nur dann
 //	"isOk", wenn ein geeigneter Unterknoten vom Typ TEXT_NODE existiert und
-//	dieser einen String mit einer Länge größer Null beinnhaltet.
+//	dieser einen String mit einer Lï¿½nge grï¿½ï¿½er Null beinnhaltet.
 //
 ReturnStatus TdfAccess::getValueOfDomNode(String& textValue, DOMNode* node)
 {
@@ -3610,7 +3609,7 @@ ReturnStatus TdfAccess::getValueOfDomNode(String& textValue, DOMNode* node)
 	TRACE_FUNCTION("TdfAccess::getValueOfDomNode(...)");
 #endif	
 	const DOMNode* textNode = node->getFirstChild();
-	// Das erste Kind des Knoten muß existieren und ein Text-Knoten sein
+	// Das erste Kind des Knoten muï¿½ existieren und ein Text-Knoten sein
 	if (!textNode==null)
 	{
 
@@ -3639,7 +3638,7 @@ ReturnStatus TdfAccess::getValueOfDomNode(String& textValue, DOMNode* node)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//	Extrahiert die Werte für die Authentifizierung (User, Password, etc.) aus einem DOM-Dokument
+//	Extrahiert die Werte fï¿½r die Authentifizierung (User, Password, etc.) aus einem DOM-Dokument
 //
 ReturnStatus TdfAccess::getAuthenticationParameter(DOMDocument*	dom,
 												   String&			usr,
@@ -3661,13 +3660,13 @@ ReturnStatus TdfAccess::getAuthenticationParameter(DOMDocument*	dom,
 
 	// Liste aller Kinder der Wurzel holen
 	DOMNodeList* childsFromRoot = root->getChildNodes();
-	// Iteration über die Liste der Kinder
+	// Iteration ï¿½ber die Liste der Kinder
 	for (int i = 0; i < childsFromRoot->getLength(); i++)
 	{
 		// Knoten i holen
 		DOMNode* child = childsFromRoot->item(i);
 
-		// Koten-Typ prüfen
+		// Koten-Typ prï¿½fen
 		if (DOMNode::ELEMENT_NODE == child->getNodeType())
 		{
 			// Namen des Knoten holen
@@ -3680,7 +3679,7 @@ ReturnStatus TdfAccess::getAuthenticationParameter(DOMDocument*	dom,
 			{
 				// Liste der KindKnoten von Authentication holen ...
 				DOMNodeList* childsFromAuthNode = child->getChildNodes();
-				// ... und drüber iterieren
+				// ... und drï¿½ber iterieren
 				for (int k = 0; k < childsFromAuthNode->getLength(); k++)
 				{
 					// Knoten i holen
@@ -3769,12 +3768,12 @@ ReturnStatus TdfAccess::createTdfArgument(TdfArgument*	tdfArgument,
 	tdfArgument->setApplicationId(applicationId);	// Kennung des OSA-Clients
 	tdfArgument->setOsaTicket(osaTicket);			// Zugriffskontrolle
 	tdfArgument->setReference(requestId);			// eindeutige Nummer des Requestes
-	tdfArgument->setDataFormat(tdsDataFormat);		// zeigt an, daß die Daten im TDS-Format kommen
+	tdfArgument->setDataFormat(tdsDataFormat);		// zeigt an, daï¿½ die Daten im TDS-Format kommen
 	tdfArgument->setData(tdsRequest);				// die eigentlichen Daten
 													// die Daten des Objektes werden hier kopiert !
-	tdfArgument->setSourceId(0);					// Hier nur ein Dummy für die Channel Nummer
+	tdfArgument->setSourceId(0);					// Hier nur ein Dummy fï¿½r die Channel Nummer
 													// damit der Test gut geht
-	tdfArgument->setRequestAddress(tdfOriginId);	// Client-Info für MIS Statistik
+	tdfArgument->setRequestAddress(tdfOriginId);	// Client-Info fï¿½r MIS Statistik
 	if (!linkContextString.isEmpty())
 	{
 		tdfArgument->setLinkContext(hexToData(linkContextString.cString()));	// TDF LinkContext setzen
@@ -3786,7 +3785,7 @@ ReturnStatus TdfAccess::createTdfArgument(TdfArgument*	tdfArgument,
 		idaTrackExcept(("TdfAccess::handleRequest: tdfArgument - args missing"));
 
 		#ifdef MONITORING
-			cout << dbIdString << "\nTdfArgument: args missing !" << endl;
+			std::cout << dbIdString << "\nTdfArgument: args missing !" << std::endl;
 		#endif
 
 		errorText = "TdfArgument: args missing";
@@ -3834,12 +3833,12 @@ ReturnStatus TdfAccess::createTdfArgument(TdfArgument*  tdfArgument,
         tdfArgument->setApplicationId(applicationId);   // Kennung des OSA-Clients
         tdfArgument->setOsaTicket(osaTicket);                   // Zugriffskontrolle
         tdfArgument->setReference(requestId);                   // eindeutige Nummer des Requestes
-        tdfArgument->setDataFormat(tdsModifyDataFormat);              // zeigt an, daß die Daten im TDS-ModifyFormat kommen
+        tdfArgument->setDataFormat(tdsModifyDataFormat);              // zeigt an, daï¿½ die Daten im TDS-ModifyFormat kommen
         tdfArgument->setData(modifyRequest);                               // die eigentlichen Daten
                                                                           // die Daten des Objektes werden hier kopiert !
-        tdfArgument->setSourceId(0);                                    // Hier nur ein Dummy für die Channel Nummer
+        tdfArgument->setSourceId(0);                                    // Hier nur ein Dummy fï¿½r die Channel Nummer
                                                                                                         // damit der Test gut geht
-        tdfArgument->setRequestAddress(tdfOriginId);    // Client-Info für MIS Statistik
+        tdfArgument->setRequestAddress(tdfOriginId);    // Client-Info fï¿½r MIS Statistik
         if (!linkContextString.isEmpty())
         {
                 tdfArgument->setLinkContext(hexToData(linkContextString.cString()));    // TDF LinkContext setzen
@@ -3851,7 +3850,7 @@ ReturnStatus TdfAccess::createTdfArgument(TdfArgument*  tdfArgument,
                 idaTrackExcept(("TdfAccess::handleRequest: tdfArgument - args missing"));
 
                 #ifdef MONITORING
-                        cout << dbIdString << "\nTdfArgument: args missing !" << endl;
+                        std::cout << dbIdString << "\nTdfArgument: args missing !" << std::endl;
                 #endif
 
                 errorText = "TdfArgument: args missing";
@@ -3866,9 +3865,9 @@ ReturnStatus TdfAccess::createTdfArgument(TdfArgument*  tdfArgument,
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Diese Methode hat die Aufgabe die Liste der vorbereiteten Request-Objekte (Sendqueue)
-//	abzuarbeiten. Sie prüft, ob Requests darauf warten verarbeitet zu werden und entscheidet
-//	dann anhand ihres Status, ob z.B. zunächst eine Authentifizierung beim SES-Prozeß 
-//	eingeholt werden muß, oder eine Such-Anfrage an das OSA-GW gesendet werden kann.
+//	abzuarbeiten. Sie prï¿½ft, ob Requests darauf warten verarbeitet zu werden und entscheidet
+//	dann anhand ihres Status, ob z.B. zunï¿½chst eine Authentifizierung beim SES-Prozeï¿½ 
+//	eingeholt werden muï¿½, oder eine Such-Anfrage an das OSA-GW gesendet werden kann.
 //
 Void TdfAccess::processSendQueue()
 {
@@ -3880,18 +3879,18 @@ Void TdfAccess::processSendQueue()
 
 	// -------------------------------------------------------------------------
 	// Wir brauchen nur zu senden, wenn die Registrierung steht
-	// Dadurch werden überflüssige Sendeversuche vermieden
+	// Dadurch werden ï¿½berflï¿½ssige Sendeversuche vermieden
 //	if (getStatus() != registered)
 //	{
 //		// Wenn nicht, dann wird der Timer gestartet, damit diese Methode
-//		// regelmäßig wieder aufgerufen wird
+//		// regelmï¿½ï¿½ig wieder aufgerufen wird
 //		startSendRetryTimer();
 //		return;
 //	}
 
 
 	// -------------------------------------------------------------------------
-	// Der älteste Request kommt zuerst dran
+	// Der ï¿½lteste Request kommt zuerst dran
 	// Wenn das Ergebnis "false" ist, dann gibt es nichts zu tun
 	RequestContainer requestContainer;
 	if (!requestPool.getOldestWaitingRequest(requestContainer)) return;
@@ -3904,7 +3903,7 @@ Void TdfAccess::processSendQueue()
 	{
 		idaTrackExcept(("no free channel found"));
 		#ifdef MONITORING
-			cout << dbIdString << "\t\t\t\t*** no free channel" << endl;
+			std::cout << dbIdString << "\t\t\t\t*** no free channel" << std::endl;
 		#endif
 		return;
 	}
@@ -3920,7 +3919,7 @@ Void TdfAccess::processSendQueue()
 	// -------------------------------------------------------------------------
 	// Feuer frei !!
 	#ifdef MONITORING
-		cout << dbIdString << "\t\t\t\tchannel = " << channel << endl;
+		std::cout << dbIdString << "\t\t\t\tchannel = " << channel << std::endl;
 	#endif
 
 	ReturnStatus rs = isNotOk;
@@ -3957,9 +3956,9 @@ Void TdfAccess::processSendQueue()
 	{
 		OsaComError error = getLastError();
 		#ifdef MONITORING
-			cout << "search/modifyRequest() failed: " << error.getErrorCode() << "\n\t"
+			std::cout << "search/modifyRequest() failed: " << error.getErrorCode() << "\n\t"
 				 << error.getErrorSource() << "\n\t"
-				 << error.getErrorText() << endl;
+				 << error.getErrorText() << std::endl;
 		#endif
 
 		idaTrackData(("search/modifyRequest() failed:  error.getErrorCode() = %d", error.getErrorCode() ));
@@ -3972,10 +3971,10 @@ Void TdfAccess::processSendQueue()
 		idaTrackExcept(("search/modifyRequest() failed"));
 
 		#ifdef MONITORING
-			cout << dbIdString << "searchRequest failed !" << endl;
+			std::cout << dbIdString << "searchRequest failed !" << std::endl;
 		#endif
 
-		// Den Channel müssen wir wieder freigeben
+		// Den Channel mï¿½ssen wir wieder freigeben
 		requestContainer.setChannel(0);
 		requestContainer.getTdfArgument()->setSourceId(0);
 		channelMgr.releaseChannel(channel);
@@ -3999,11 +3998,11 @@ Data& TdfAccess::hexToData(const char * hex)
 	TRACE_FUNCTION("TdfAccess::hexToData(...)");
 #endif
 
-	// Buffer zurücksetzen
+	// Buffer zurï¿½cksetzen
 	tempData.reset();
 	static char buffer[1024];
 
-	// Schutz vor Null-Pointer Übergabe
+	// Schutz vor Null-Pointer ï¿½bergabe
 	if (hex == 0) return tempData;
 
 	int i = 0, l = 0;
@@ -4048,7 +4047,7 @@ UShort TdfAccess::ushortOfString(const char* str)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //	Die Methode ermittelt den Tag-Namen des obersten Elementes (Wurzel-Element) des mit "dom"
-//	übergebenen DOM-Dokumentes
+//	ï¿½bergebenen DOM-Dokumentes
 //
 ReturnStatus TdfAccess::getRootElementName(DOMDocument*	dom,
 										   String&			rootElementName)
@@ -4102,7 +4101,7 @@ ReturnStatus TdfAccess::getParameterFromDom(DOMDocument*	dom,
 		// Knoten i holen
 		DOMNode* child = childsFromRoot->item(i);
 
-		// Koten-Typ prüfen
+		// Koten-Typ prï¿½fen
 		if (DOMNode::ELEMENT_NODE == child->getNodeType())
 		{
 			// Namen des Knoten holen
@@ -4164,7 +4163,7 @@ ReturnStatus TdfAccess::getTimeoutFromDom(DOMDocument* dom, ULong& timeout)
 		// Knoten i holen
 		DOMNode* child = childsFromRoot->item(i);
 
-		// Koten-Typ prüfen
+		// Koten-Typ prï¿½fen
 		if (DOMNode::ELEMENT_NODE == child->getNodeType())
 		{
 			// Namen des Knoten holen
@@ -4209,7 +4208,7 @@ ReturnStatus TdfAccess::terminateXMLPlatform()
         {
                 idaTrackFatal(("XMLPlatformUtils::Terminate() failed !"));
                 #ifdef MONITORING
-                        cout << dbIdString << "XMLPlatformUtils::Terminate() failed !" << end
+                        std::cout << dbIdString << "XMLPlatformUtils::Terminate() failed !" << end
 l;
                 #endif
 
@@ -4235,7 +4234,7 @@ ReturnStatus TdfAccess::createModifySpecification(ModifyRequest& modifyRequest, 
         ULong enumVal;
 
         #ifdef XML_REQ_MON
-                cout << dbIdString << "\tModifySpec" << endl;
+                std::cout << dbIdString << "\tModifySpec" << std::endl;
         #endif
 
         DOMNodeList* nodeList = node->getChildNodes();
@@ -4264,7 +4263,7 @@ ReturnStatus TdfAccess::createModifySpecification(ModifyRequest& modifyRequest, 
                                 if (StringToEnum::enumOfModifyOperation(enumVal, stringValue.cString()) == isOk)
                                 {
                                         #ifdef XML_REQ_MON
-                                                cout << dbIdString << "\t\tOperation = " << stringValue << endl;
+                                                std::cout << dbIdString << "\t\tOperation = " << stringValue << std::endl;
                                         #endif
                                         modifyRequest.setOperation((ModifyRequest::Operation)enumVal);
                                         continue;
@@ -4282,7 +4281,7 @@ ReturnStatus TdfAccess::createModifySpecification(ModifyRequest& modifyRequest, 
                         if (getValueOfDomNode(stringValue, child) == isOk)
                         {
                                 #ifdef XML_REQ_MON
-                                        cout << dbIdString << "\t\tlinkContext = " << stringValue << endl;
+                                        std::cout << dbIdString << "\t\tlinkContext = " << stringValue << std::endl;
                                 #endif
                                 modifyRequest.setLinkContext(hexToData(stringValue.cString()));
                         }
@@ -4305,7 +4304,7 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
 	SetOfDbAttribute        set;
 
         #ifdef XML_REQ_MON
-                cout << dbIdString << "\tModifyAttributes" << endl;
+                std::cout << dbIdString << "\tModifyAttributes" << std::endl;
         #endif
 
         DOMNode* child;
@@ -4323,12 +4322,12 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
         idaTrackTrace(("TdfAccess::createModifyAttributes after child = node->getFirstChild()"));
 
         // -------------------------------------------------------------------------
-        // Iteration über alle ModifyAttr-Knoten
+        // Iteration ï¿½ber alle ModifyAttr-Knoten
         while (!child==null)
         {
           idaTrackTrace(("TdfAccess::createModifyAttributes after !child==null"));
                 // ---------------------------------------------------------------------
-                // Für alle Faelle pruefen wir mal, ob wir nicht etwas falsches bekommen haben
+                // Fï¿½r alle Faelle pruefen wir mal, ob wir nicht etwas falsches bekommen haben
                 const XMLCh* name = child->getNodeName();
                 idaTrackTrace(("TdfAccess::createModifyAttributes after child->getNodeName()"));
                 char* transName = XMLString::transcode(name);
@@ -4353,7 +4352,7 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
 
                 idaTrackTrace(("TdfAccess::createModifyAttributes before DOMNodeList* nodeList = child->getChildNodes()"));
                 // ---------------------------------------------------------------------
-                // Wenn der Knoten keine Kinder hat, machen wir auch mit dem nächsten weiter
+                // Wenn der Knoten keine Kinder hat, machen wir auch mit dem nï¿½chsten weiter
                 DOMNodeList* nodeList = child->getChildNodes();
                 if (0 == nodeList->getLength())
                 {
@@ -4362,16 +4361,16 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
                 }
 
                 #ifdef XML_REQ_MON
-                cout << dbIdString << "\t\tModifyAttr" << endl;
+                std::cout << dbIdString << "\t\tModifyAttr" << std::endl;
                 #endif
 
                 idaTrackTrace(("TdfAccess::createModifyAttributes before  for (int i = 0; i < nodeList->getLength(); i++)"));
                 // ---------------------------------------------------------------------
                 // Wir haben eine SearchAttr Knoten gefunden, der auch Kinder hat.
-                // Es folgt eine Iteration über alle Kinder
+                // Es folgt eine Iteration ï¿½ber alle Kinder
                 DbAttribute attr;
                 attr.reset();
-                ULong variation = 0;                    // für die Variation
+                ULong variation = 0;                    // fï¿½r die Variation
                 Bool legalAttribut = false;             // Flag zur Schleifensteuerung
 
                 for (int i = 0; i < nodeList->getLength(); i++)
@@ -4392,7 +4391,7 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
                                         if (StringToEnum::enumOfDbAttribute(enumVal, stringValue.cString()) == isOk)
                                         {
                                                 #ifdef XML_REQ_MON
-                                                        cout << dbIdString << "\t\t\tAttribute = " << stringValue << endl;
+                                                        std::cout << dbIdString << "\t\t\tAttribute = " << stringValue << std::endl;
                                                 #endif
                                                 attr.setAttributeId((DbAttribute::AttributeId)enumVal);
                                                  idaTrackData(("XML:Request/ModifyAttributes/Attribute: "));
@@ -4416,7 +4415,7 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
                                 if (getValueOfDomNode(stringValue, childChild) == isOk)
                                 {
                                         #ifdef XML_REQ_MON
-                                                cout << dbIdString << "\t\t\tValue = " << stringValue.cString() << endl;
+                                                std::cout << dbIdString << "\t\t\tValue = " << stringValue.cString() << std::endl;
                                         #endif
                                         attr.setData(stringValue.cString());
                                         idaTrackData(("XML:Request/ModifyAttributes/Attribute/Value : %s", stringValue.cString()));
@@ -4427,7 +4426,7 @@ ReturnStatus TdfAccess::createModifyAttributes(ModifyRequest& modifyRequest, DOM
                         }
                 }
                 // ---------------------------------------------------------------------
-                // Wenn ein gültiges Attribut gefunden wurde ...
+                // Wenn ein gï¿½ltiges Attribut gefunden wurde ...
                 if (legalAttribut)
                 {
                         set.insert(attr);
@@ -4459,7 +4458,7 @@ ReturnStatus TdfAccess::createModifyFlags(ModifyRequest& modifyRequest, DOMNode*
 	ULong flagsMask = 0;
 
         #ifdef XML_REQ_MON
-                cout << dbIdString << "\tModifyFlags" << endl;
+                std::cout << dbIdString << "\tModifyFlags" << std::endl;
         #endif
 
         DOMNodeList* nodeList = node->getChildNodes();
